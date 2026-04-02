@@ -1,27 +1,20 @@
 <!DOCTYPE html>
-<html lang="id" className="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VerifDigi Pro - Night Edition</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { 
-                extend: { 
-                    fontFamily: { sans: ['Inter', 'sans-serif'] }, 
-                    colors: { 
-                        night: { 50: '#f0f9ff', 100: '#e0f2fe', 800: '#0c1c38', 900: '#060f20', 950: '#020617' },
-                        brand: { 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7' }
-                    } 
-                } 
-            }
-        }
-    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- React & Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
@@ -30,24 +23,48 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
     <style>
-        body { background: #020617; color: #e2e8f0; -webkit-font-smoothing: antialiased; margin: 0; padding: 0; }
+        /* TEMA BIRU HITAM MALAM */
+        body { 
+            background-color: #0b1120; /* Deep Navy Night */
+            color: #e2e8f0; 
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Custom UI Elements */
+        .glass-header { background: rgba(11, 17, 32, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid #1e293b; }
+        .card-custom { background-color: #111827; border: 1px solid #1e293b; border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .card-stats { background: linear-gradient(135deg, #0284c7, #1e3a8a); border: none; color: white; }
+        
+        .nav-pills .nav-link { color: #94a3b8; border-radius: 1rem; padding: 10px 20px; font-weight: 600; transition: all 0.3s; }
+        .nav-pills .nav-link:hover { background-color: #1e293b; color: #f8fafc; }
+        .nav-pills .nav-link.active { background-color: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
+        
+        .form-control, .form-select { background-color: #0f172a; border: 1px solid #334155; color: #f8fafc; border-radius: 1rem; padding: 12px 16px; }
+        .form-control:focus, .form-select:focus { background-color: #1e293b; border-color: #3b82f6; color: white; box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25); }
+        .form-select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); }
+        
+        .table { color: #cbd5e1; }
+        .table-dark { background-color: transparent; }
+        .table-dark th { background-color: #0f172a; border-bottom: 2px solid #334155; color: #94a3b8; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem; }
+        .table-dark td { background-color: #111827; border-bottom: 1px solid #1e293b; vertical-align: middle; }
+        .table-hover>tbody>tr:hover>td { background-color: #1e293b; color: white; }
+
+        .btn-brand { background-color: #2563eb; border: none; color: white; border-radius: 1rem; padding: 12px 24px; font-weight: 700; transition: all 0.2s; }
+        .btn-brand:hover { background-color: #1d4ed8; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); color: white;}
+        .btn-light-custom { background-color: #1e293b; color: #e2e8f0; border: none; border-radius: 1rem; padding: 12px 24px; font-weight: 700; }
+        .btn-light-custom:hover { background-color: #334155; color: white; }
+
+        .badge-brand { background-color: #1e3a8a; color: #93c5fd; padding: 6px 12px; border-radius: 8px; border: 1px solid #1e40af; font-size: 0.75rem; }
+
+        /* Scrollbar & Animations */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-track { background: #0b1120; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .glass-panel { background: rgba(6, 15, 32, 0.85); backdrop-filter: blur(16px); border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
-        .glass-card { background: #0c1c38; border: 1px solid #1e293b; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
-        
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-        .animate-slide-up { animation: slideUp 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .loader { border: 4px solid #1e293b; border-bottom-color: #38bdf8; border-radius: 50%; display: inline-block; box-sizing: border-box; animation: rotation 1s linear infinite; }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .spinner-border { width: 3rem; height: 3rem; border-width: 0.3em; }
     </style>
 </head>
 <body>
@@ -55,55 +72,51 @@
 
     <script type="text/babel">
         // =========================================================================
-        // URL WEB APP GAS - PASTIKAN SUDAH NEW DEPLOYMENT!!
+        // URL WEB APP GAS - (Otomatis Tersimpan di Sistem)
         // =========================================================================
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-Ez4pHMQ7aZycAoF9-Pz-p9bEmSBc0LSQuAQwdvFMntdwQ24_5rRSZ0KQVUgQbFzF/exec"; 
 
         const { useState, useEffect, useRef } = React;
 
-        const Icons = {
-            Upload: (p) => <svg {...p} width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
-            Scan: (p) => <svg {...p} width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>,
-            Database: (p) => <svg {...p} width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>,
-            Chart: (p) => <svg {...p} width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>,
-            Archive: (p) => <svg {...p} width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="5" rx="2"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><line x1="10" y1="13" x2="14" y2="13"/></svg>,
-            Search: (p) => <svg {...p} width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
-            Check: ({className, ...p}) => <svg {...p} width="32" height="32" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className || "text-emerald-400"}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
-            PDF: (p) => <svg {...p} width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15v-4"/><path d="M12 15v-4"/><path d="M15 15v-4"/></svg>,
-            Excel: (p) => <svg {...p} width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>,
-            Pages: (p) => <svg {...p} width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 22H4a2 2 0 0 1-2-2V6"/></svg>,
-            User: (p) => <svg {...p} width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-            Settings: (p) => <svg {...p} width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        };
-
-        const Toast = ({ message, type, onClose }) => {
-            useEffect(() => { const timer = setTimeout(onClose, 8000); return () => clearTimeout(timer); }, [onClose]);
-            const bgClass = type === 'error' ? 'bg-red-900 border border-red-700' : type === 'success' ? 'bg-emerald-900 border border-emerald-700' : 'bg-slate-800 border border-slate-700';
+        // --- Komponen Toast Notifikasi ---
+        const ToastMessage = ({ message, type, onClose }) => {
+            useEffect(() => { const timer = setTimeout(onClose, 5000); return () => clearTimeout(timer); }, [onClose]);
+            const bgClass = type === 'error' ? 'bg-danger' : 'bg-success';
+            const icon = type === 'error' ? 'fa-triangle-exclamation' : 'fa-check-circle';
+            
             return (
-                <div className={`fixed bottom-6 right-6 z-[999] ${bgClass} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-slide-up max-w-md`}>
-                    {type === 'success' && <Icons.Check className="w-6 h-6 text-emerald-400 shrink-0" />}
-                    <span className="font-semibold text-sm break-words flex-1">{message}</span>
-                    <button onClick={onClose} className="text-white/50 hover:text-white shrink-0">✕</button>
+                <div className={`toast show align-items-center text-white ${bgClass} border-0 mb-3`} role="alert">
+                    <div className="d-flex">
+                        <div className="toast-body d-flex align-items-center gap-3 fw-bold">
+                            <i className={`fas ${icon} fs-4`}></i>
+                            {message}
+                        </div>
+                        <button type="button" className="btn-close btn-close-white me-2 m-auto" onClick={onClose}></button>
+                    </div>
                 </div>
             );
         };
 
         function App() {
+            // STATE NAVIGASI
             const [activeTab, setActiveTab] = useState('upload'); 
+            
+            // STATE PENGATURAN URL
             const [showSettings, setShowSettings] = useState(false);
             const [backendUrl, setBackendUrl] = useState(localStorage.getItem('VERIFDIGI_BACKEND_URL') || GAS_WEB_APP_URL);
             const [tempUrl, setTempUrl] = useState(backendUrl);
 
-            // STATE UPLOAD
-            const [uploadState, setUploadState] = useState('idle');
-            const [processedImages, setProcessedImages] = useState([]);
+            // STATE UPLOAD & AI
+            const [uploadState, setUploadState] = useState('idle'); 
+            const [processedImages, setProcessedImages] = useState([]); 
             const [extractedData, setExtractedData] = useState({ sekolah: '', bulan: '', tahun: '', siswa: [] });
             
-            // STATE DATA & FILTER
+            // STATE DATABASE SPREADSHEET
             const [records, setRecords] = useState([]);
             const [loadingData, setLoadingData] = useState(false);
             const [toast, setToast] = useState(null);
             
+            // STATE FILTER
             const [filterPendamping, setFilterPendamping] = useState('');
             const [filterBentuk, setFilterBentuk] = useState('');
             const [filterTingkat, setFilterTingkat] = useState('');
@@ -115,47 +128,47 @@
 
             const showToast = (message, type = 'success') => setToast({ message, type });
 
+            // Fetch Data
             useEffect(() => {
-                if (activeTab !== 'upload' && activeTab !== 'settings' && records.length === 0) fetchData();
+                if (activeTab !== 'upload' && records.length === 0) fetchData();
             }, [activeTab]);
 
             const saveSettings = () => {
                 localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl);
                 setBackendUrl(tempUrl);
                 setShowSettings(false);
-                showToast('URL Backend berhasil disimpan!', 'success');
+                showToast('URL Backend API berhasil disimpan!', 'success');
             };
 
-            // ==========================================
-            // MULTI-IMAGE OCR & PROCESSING
-            // ==========================================
+            // =====================================================================================
+            // LOGIKA PEMROSESAN GAMBAR CANVAS
+            // =====================================================================================
             const handleFileChange = async (e) => {
-                const files = Array.from(e.target.files || []);
-                if (files.length === 0) return;
-                if (!backendUrl) {
-                    setShowSettings(true);
-                    return showToast('Masukkan URL Backend Google Apps Script!', 'error');
-                }
-                
-                setUploadState('processing_image');
-                const base64Array = [];
+                try {
+                    const files = Array.from(e.target.files || []);
+                    if (files.length === 0) return;
+                    
+                    if (!backendUrl) {
+                        setShowSettings(true);
+                        return showToast('Masukkan URL Google Apps Script di Pengaturan!', 'error');
+                    }
+                    
+                    setUploadState('processing_image');
+                    const base64Array = [];
 
-                for (let file of files) {
-                    try {
+                    for (let file of files) {
                         const base64 = await processSingleImage(file);
                         base64Array.push(base64);
-                    } catch (error) {
-                        console.error(error);
                     }
-                }
 
-                if (base64Array.length === 0) {
+                    if (base64Array.length === 0) throw new Error("Gagal membaca file");
+
+                    setProcessedImages(base64Array);
+                    extractTextFromMultipleImages(base64Array);
+                } catch (error) {
                     setUploadState('idle');
-                    return showToast('Gagal memproses gambar.', 'error');
+                    showToast('Gagal memproses gambar: ' + error.message, 'error');
                 }
-
-                setProcessedImages(base64Array);
-                extractTextFromMultipleImages(base64Array);
             };
 
             const processSingleImage = (file) => {
@@ -184,11 +197,28 @@
                 });
             };
 
+            // =====================================================================================
+            // LOGIKA FETCH KE GOOGLE APPS SCRIPT (AI)
+            // =====================================================================================
             const extractTextFromMultipleImages = async (base64Array) => {
                 setUploadState('extracting');
                 try {
                     const cleanBase64Array = base64Array.map(img => img.split(',')[1]);
                     
+                    // MODE SIMULASI JIKA URL KOSONG
+                    if (backendUrl === "") {
+                        await new Promise(r => setTimeout(r, 2000));
+                        setExtractedData({
+                            sekolah: 'SD NEGERI RANGDA MALINGKUNG 4 (SIMULASI)', bulan: 'JANUARI', tahun: '2026', 
+                            siswa: [
+                                { nik_pengurus: '6305094703880001', nama_pengurus: 'ELY SRILESTARI', nik_siswa: '6305043004180001', nisn: '3187240495', nama_siswa: 'ABDUL GHANI BAYHAKI', bentuk: 'SD', tingkat: 'Kelas 2', pendamping: 'M ZAEN SYACHRULLAH' }
+                            ]
+                        });
+                        setUploadState('form');
+                        return showToast(`Mode Simulasi: Membaca 1 baris.`, 'success');
+                    }
+
+                    // FETCH ASLI
                     const res = await fetch(backendUrl, {
                         method: 'POST', 
                         body: JSON.stringify({ action: 'extract_multiple', images: cleanBase64Array }), 
@@ -200,21 +230,21 @@
                     try {
                         data = JSON.parse(textResponse);
                     } catch(e) {
-                        throw new Error("Server mengembalikan format yang salah: " + textResponse.substring(0, 100));
+                        throw new Error("Server Error Parsing: " + textResponse.substring(0, 150));
                     }
 
                     if (data.status === 'success') {
                         const safeData = {
-                            sekolah: data.data.sekolah || 'Tidak Terdeteksi',
-                            bulan: data.data.bulan || '-',
-                            tahun: data.data.tahun || '-',
-                            siswa: Array.isArray(data.data.siswa) ? data.data.siswa : [] 
+                            sekolah: data.data?.sekolah || 'Tidak Terdeteksi',
+                            bulan: data.data?.bulan || '-',
+                            tahun: data.data?.tahun || '-',
+                            siswa: Array.isArray(data.data?.siswa) ? data.data.siswa : [] 
                         };
                         setExtractedData(safeData);
                         setUploadState('form');
-                        showToast(`Berhasil membaca ${safeData.siswa.length} baris data dari ${base64Array.length} foto!`, 'success');
+                        showToast(`Berhasil mengekstrak ${safeData.siswa.length} baris dari ${base64Array.length} foto!`, 'success');
                     } else {
-                        throw new Error(data.message || "Error tidak diketahui dari AI.");
+                        throw new Error(data.message || "Error dari AI");
                     }
                 } catch (err) {
                     console.error(err);
@@ -239,6 +269,12 @@
                         doc.addImage(imgBase64, 'JPEG', 0, 0, pdfWidth, pdfHeight);
                     });
 
+                    if (backendUrl === "") {
+                        await new Promise(r => setTimeout(r, 1500));
+                        setUploadState('success');
+                        return showToast('Mode Simulasi: Data Disimpan.', 'success');
+                    }
+
                     const pdfBase64Data = doc.output('datauristring').split(',')[1];
                     const payload = { action: 'save', pdfBase64: pdfBase64Data, sekolah: extractedData.sekolah, bulan: extractedData.bulan, tahun: extractedData.tahun, siswa: extractedData.siswa || [] };
                     
@@ -248,11 +284,7 @@
                         headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                     });
                     
-                    const textResponse = await res.text();
-                    let resData;
-                    try { resData = JSON.parse(textResponse); } 
-                    catch(e) { throw new Error("Server Error: " + textResponse.substring(0,100)); }
-                    
+                    const resData = await res.json();
                     if (resData.status !== 'success') throw new Error(resData.message);
                     
                     fetchData(); 
@@ -273,20 +305,18 @@
                     const result = await res.json();
                     if (result.status === 'success') {
                         setRecords(Array.isArray(result.data) ? result.data : []);
-                    } else showToast("Gagal memuat: " + result.message, 'error');
+                    } else throw new Error(result.message);
                 } catch (error) { 
-                    console.error(error);
-                    showToast("Gagal memuat database dari server Google.", 'error'); 
+                    showToast("Gagal memuat database dari Server", 'error'); 
                 } finally { setLoadingData(false); }
             };
 
             const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedImages([]); };
 
-            // ==========================================
-            // AGREGASI & FILTER DATA
-            // ==========================================
+            // =====================================================================================
+            // LOGIKA FILTERING DATA
+            // =====================================================================================
             const currentRecords = Array.isArray(records) ? records : [];
-            
             const optionsPendamping = [...new Set(currentRecords.map(r => r?.pendamping))].filter(Boolean);
             const optionsBentuk = [...new Set(currentRecords.map(r => r?.bentuk))].filter(Boolean);
             const optionsTingkat = [...new Set(currentRecords.map(r => r?.tingkat))].filter(Boolean);
@@ -294,16 +324,12 @@
             const filteredKomponen = currentRecords.filter(item => {
                 if (!item) return false;
                 const matchSearch = Object.values(item).some(val => String(val || '').toLowerCase().includes(searchQuery.toLowerCase()));
-                const matchPendamping = filterPendamping ? item.pendamping === filterPendamping : true;
-                const matchBentuk = filterBentuk ? item.bentuk === filterBentuk : true;
-                const matchTingkat = filterTingkat ? item.tingkat === filterTingkat : true;
-                return matchSearch && matchPendamping && matchBentuk && matchTingkat;
+                return matchSearch && (filterPendamping ? item.pendamping === filterPendamping : true) 
+                    && (filterBentuk ? item.bentuk === filterBentuk : true) 
+                    && (filterTingkat ? item.tingkat === filterTingkat : true);
             });
 
-            const aggregatePendamping = filteredKomponen.reduce((acc, curr) => { 
-                const p = curr.pendamping || 'Tanpa Nama'; acc[p] = (acc[p] || 0) + 1; return acc; 
-            }, {});
-            
+            const aggregatePendamping = filteredKomponen.reduce((acc, curr) => { const p = curr.pendamping || 'Tanpa Nama'; acc[p] = (acc[p] || 0) + 1; return acc; }, {});
             const aggregateBentukTingkat = filteredKomponen.reduce((acc, curr) => {
                 const bentuk = curr.bentuk || 'Lainnya'; const tingkat = curr.tingkat || 'Lainnya';
                 if (!acc[bentuk]) acc[bentuk] = {}; acc[bentuk][tingkat] = (acc[bentuk][tingkat] || 0) + 1;
@@ -322,416 +348,405 @@
             const totalSekolahUnik = new Set(arsipUnik.map(a => a.sekolah)).size;
             const totalPendampingAktif = new Set(arsipUnik.map(a => a.pendamping)).size;
 
-            // ==========================================
-            // EXPORT EXCEL & PDF
-            // ==========================================
+            // =====================================================================================
+            // LOGIKA EXPORT (EXCEL & PDF)
+            // =====================================================================================
             const exportToExcel = () => {
-                if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
-                if (!window.XLSX) return showToast("Library Excel gagal dimuat.", 'error');
-                try {
-                    const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Nama Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
-                    const wb = XLSX.utils.book_new();
-                    const ws = XLSX.utils.json_to_sheet(wsData);
-                    XLSX.utils.book_append_sheet(wb, ws, "Data Komponen");
-                    XLSX.writeFile(wb, `Data_Komponen_${new Date().toISOString().split('T')[0]}.xlsx`);
-                    showToast("Berhasil mendownload Excel!", "success");
-                } catch (e) { showToast("Gagal mengekspor Excel", "error"); }
+                if (filteredKomponen.length === 0) return showToast("Tidak ada data", 'error');
+                const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data");
+                XLSX.writeFile(wb, `Data_Komponen_${new Date().getTime()}.xlsx`);
             };
 
             const exportToPDF = () => {
-                if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk dicetak", 'error');
-                if (!window.jspdf || !window.jspdf.jsPDF) return showToast("Library PDF gagal dimuat.", 'error');
-                try {
-                    const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
-                    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Komponen Verifikasi", 14, 15);
-                    doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(`Total: ${filteredKomponen.length} Siswa | Petugas: ${filterPendamping || 'Semua'}`, 14, 22);
-                    const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
-                    doc.autoTable({ head: [['No', 'Asal Sekolah', 'Pendamping', 'Nama Pengurus', 'NISN Siswa', 'Nama Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [2, 132, 199] }});
-                    doc.save(`Laporan_VerifDigi_${new Date().getTime()}.pdf`);
-                    showToast("Berhasil mendownload PDF!", "success");
-                } catch (e) { showToast("Gagal mencetak PDF", "error"); }
+                if (filteredKomponen.length === 0) return showToast("Tidak ada data", 'error');
+                const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Verifikasi", 14, 15);
+                doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total: ${filteredKomponen.length} Siswa`, 14, 22);
+                const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
+                doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [37, 99, 235] }});
+                doc.save(`Laporan_${new Date().getTime()}.pdf`);
             };
 
-            const TabBtn = ({ id, label, icon: Icon }) => (
-                <button onClick={() => setActiveTab(id)} className={`flex items-center gap-2.5 px-6 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === id ? 'bg-brand-500 shadow-lg shadow-brand-500/20 text-white scale-105' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'}`}>
-                    <Icon className="w-4 h-4" /> {label}
-                </button>
-            );
-
-            const renderFilterBar = () => (
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 glass-card p-6 rounded-[2rem] mb-8 animate-fade-in">
-                    <div className="relative">
-                        <Icons.Search className="absolute left-5 top-4 text-slate-500 w-5 h-5" />
-                        <input type="text" placeholder="Cari nama, nisn..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full pl-12 pr-4 py-3.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-shadow font-semibold text-slate-200 placeholder-slate-500" />
-                    </div>
-                    <select value={filterPendamping} onChange={e => setFilterPendamping(e.target.value)} className="w-full px-5 py-3.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-bold text-slate-300 cursor-pointer">
-                        <option value="">Semua Pendamping</option>
-                        {optionsPendamping.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
-                    </select>
-                    <select value={filterBentuk} onChange={e => setFilterBentuk(e.target.value)} className="w-full px-5 py-3.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-bold text-slate-300 cursor-pointer">
-                        <option value="">Semua Jenjang</option>
-                        {optionsBentuk.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
-                    </select>
-                    <select value={filterTingkat} onChange={e => setFilterTingkat(e.target.value)} className="w-full px-5 py-3.5 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-bold text-slate-300 cursor-pointer">
-                        <option value="">Semua Kelas</option>
-                        {optionsTingkat.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
-                    </select>
-                </div>
-            );
-
+            // =====================================================================================
+            // RENDER UI (BOOTSTRAP 5)
+            // =====================================================================================
             return (
-                <div className="min-h-screen flex flex-col font-sans">
-                    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-                    <canvas ref={canvasRef} className="hidden"></canvas>
+                <div>
+                    {/* Toast Notification Container */}
+                    <div className="toast-container">
+                        {toast && <ToastMessage message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+                    </div>
 
+                    {/* MODAL SETTINGS */}
                     {showSettings && (
-                        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-fade-in">
-                            <div className="glass-card rounded-[2rem] p-10 w-full max-w-xl shadow-2xl animate-slide-up border border-slate-700">
-                                <div className="flex items-center gap-4 mb-8 text-brand-400 border-b border-slate-800 pb-6">
-                                    <div className="bg-slate-800 p-3 rounded-2xl"><Icons.Settings className="w-8 h-8" /></div>
-                                    <h2 className="text-3xl font-black text-white tracking-tight">Setup Server API</h2>
-                                </div>
-                                <div className="mb-8">
-                                    <label className="block text-sm font-bold text-slate-400 mb-3 uppercase tracking-wider">URL Google Apps Script</label>
-                                    <input type="text" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/macros/s/..." className="w-full bg-slate-900 border border-slate-700 rounded-2xl px-5 py-4 text-white font-medium focus:ring-2 focus:ring-brand-500 outline-none transition-all" />
-                                    <p className="text-sm text-slate-500 mt-4 leading-relaxed font-medium">Tempelkan URL Web App dari hasil deployment Google Apps Script Anda untuk menghubungkan Frontend ke AI dan Database.</p>
-                                </div>
-                                <div className="flex gap-4 justify-end pt-2">
-                                    <button onClick={() => setShowSettings(false)} className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-2xl transition-colors">Tutup</button>
-                                    <button onClick={saveSettings} className="px-10 py-4 bg-brand-600 hover:bg-brand-500 text-white font-black rounded-2xl shadow-lg shadow-brand-500/20 transition-all hover:-translate-y-1">Simpan API URL</button>
+                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.8)'}} tabIndex="-1">
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content card-custom">
+                                    <div className="modal-header border-secondary border-opacity-50 pb-3">
+                                        <h5 className="modal-title fw-bold text-white"><i className="fas fa-server text-primary me-2"></i> Pengaturan API</h5>
+                                    </div>
+                                    <div className="modal-body py-4">
+                                        <label className="form-label text-secondary fw-bold small">URL Google Apps Script</label>
+                                        <input type="text" className="form-control form-control-lg bg-dark text-white border-secondary border-opacity-50" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/..." />
+                                        <div className="form-text text-secondary mt-2">Hubungkan Web ini dengan Google Sheets melalui Apps Script.</div>
+                                    </div>
+                                    <div className="modal-footer border-0 pt-0">
+                                        <button type="button" className="btn btn-light-custom" onClick={() => setShowSettings(false)}>Batal</button>
+                                        <button type="button" className="btn btn-brand" onClick={saveSettings}>Simpan URL</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    <header className="sticky top-0 z-40 glass-panel shadow-sm">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col xl:flex-row justify-between items-center gap-4">
-                            <div className="flex items-center gap-3 text-brand-400 font-black text-2xl tracking-tight cursor-pointer" onClick={() => setActiveTab('upload')}>
-                                <div className="bg-gradient-to-br from-brand-400 to-brand-600 text-white p-2.5 rounded-xl shadow-lg shadow-brand-500/20"><Icons.Scan className="w-6 h-6"/></div>
-                                <span className="text-white">Verif<span className="text-slate-400">Digi Pro</span></span>
-                            </div>
+                    {/* NAVBAR BOOTSTRAP */}
+                    <nav className="navbar navbar-expand-lg glass-header sticky-top py-3">
+                        <div className="container-fluid px-4 px-lg-5">
+                            <a className="navbar-brand fw-black text-white fs-4 d-flex align-items-center gap-2" href="#" onClick={(e)=>{e.preventDefault(); setActiveTab('upload');}}>
+                                <div className="bg-primary text-white rounded p-2 d-flex align-items-center justify-content-center shadow" style={{width:'36px', height:'36px'}}><i className="fas fa-expand"></i></div>
+                                <span>Verif<span className="text-secondary">Digi Pro</span></span>
+                            </a>
                             
-                            <div className="flex items-center gap-3 w-full xl:w-auto">
-                                <nav className="flex p-2 bg-slate-900 rounded-2xl overflow-x-auto hide-scroll border border-slate-800 w-full xl:w-auto">
-                                    <TabBtn id="upload" label="Scan AI" icon={Icons.Upload} activeTab={activeTab} setActiveTab={setActiveTab} />
-                                    <TabBtn id="dashboard_komponen" label="Statistik" icon={Icons.Chart} activeTab={activeTab} setActiveTab={setActiveTab} />
-                                    <TabBtn id="data_komponen" label="Database" icon={Icons.Database} activeTab={activeTab} setActiveTab={setActiveTab} />
-                                    <TabBtn id="dashboard_arsip" label="Dash Arsip" icon={Icons.Archive} activeTab={activeTab} setActiveTab={setActiveTab} />
-                                    <TabBtn id="arsip_pdf" label="Arsip PDF" icon={Icons.PDF} activeTab={activeTab} setActiveTab={setActiveTab} />
-                                </nav>
-                                <button onClick={() => setShowSettings(true)} className="p-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl transition-all border border-slate-700" title="API URL Settings"><Icons.Settings className="w-5 h-5" /></button>
+                            <button className="navbar-toggler border-0 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                                <i className="fas fa-bars fs-3"></i>
+                            </button>
+
+                            <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
+                                <ul className="nav nav-pills mt-3 mt-lg-0 gap-2 d-flex flex-column flex-lg-row">
+                                    <li className="nav-item">
+                                        <button onClick={() => setActiveTab('upload')} className={`nav-link w-100 text-start ${activeTab === 'upload' ? 'active' : ''}`}><i className="fas fa-upload me-2"></i> Scan AI</button>
+                                    </li>
+                                    <li className="nav-item">
+                                        <button onClick={() => setActiveTab('dashboard_komponen')} className={`nav-link w-100 text-start ${activeTab === 'dashboard_komponen' ? 'active' : ''}`}><i className="fas fa-chart-pie me-2"></i> Statistik</button>
+                                    </li>
+                                    <li className="nav-item">
+                                        <button onClick={() => setActiveTab('data_komponen')} className={`nav-link w-100 text-start ${activeTab === 'data_komponen' ? 'active' : ''}`}><i className="fas fa-database me-2"></i> Database</button>
+                                    </li>
+                                    <li className="nav-item">
+                                        <button onClick={() => setActiveTab('dashboard_arsip')} className={`nav-link w-100 text-start ${activeTab === 'dashboard_arsip' ? 'active' : ''}`}><i className="fas fa-folder-open me-2"></i> Dashboard Arsip</button>
+                                    </li>
+                                    <li className="nav-item">
+                                        <button onClick={() => setActiveTab('arsip_pdf')} className={`nav-link w-100 text-start ${activeTab === 'arsip_pdf' ? 'active' : ''}`}><i className="fas fa-file-pdf me-2"></i> Arsip PDF</button>
+                                    </li>
+                                    <li className="nav-item ms-lg-2">
+                                        <button onClick={() => setShowSettings(true)} className="btn btn-outline-secondary rounded-circle w-100 w-lg-auto"><i className="fas fa-cog"></i></button>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
-                    </header>
+                    </nav>
 
-                    <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+                    {/* MAIN CONTENT BOOTSTRAP */}
+                    <main className="container-fluid px-4 px-lg-5 py-5 flex-grow-1">
                         
-                        {/* ========================================================= */}
                         {/* 1. UPLOAD VIEW */}
-                        {/* ========================================================= */}
                         {activeTab === 'upload' && (
-                            <div className="max-w-4xl mx-auto animate-fade-in">
-                                {uploadState === 'idle' && (
-                                    <div className="glass-card p-14 rounded-[3rem] text-center relative overflow-hidden group">
-                                        <div className="absolute inset-0 bg-gradient-to-b from-brand-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                                        <div className="relative z-10">
-                                            <div className="mx-auto w-28 h-28 bg-slate-800 text-brand-400 rounded-[2rem] flex items-center justify-center mb-10 border border-slate-700 shadow-inner group-hover:-translate-y-2 transition-transform duration-500"><Icons.Pages className="w-12 h-12"/></div>
-                                            <h2 className="text-5xl font-black text-white mb-6 tracking-tight">Multi-Page AI Scanner</h2>
-                                            <p className="text-slate-400 text-xl mb-12 max-w-xl mx-auto leading-relaxed font-medium">Unggah hingga puluhan foto dokumen. AI akan otomatis mengidentifikasi 30+ baris data NIK, NISN, dan Nama Pendamping tanpa Anda harus mengetik apapun.</p>
+                            <div className="row justify-content-center fade-in">
+                                <div className="col-12 col-lg-8 col-xl-7">
+                                    
+                                    {uploadState === 'idle' && (
+                                        <div className="card-custom p-5 text-center">
+                                            <div className="mx-auto bg-dark text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 border border-secondary border-opacity-50" style={{width:'90px', height:'90px'}}>
+                                                <i className="fas fa-copy fs-1"></i>
+                                            </div>
+                                            <h1 className="fw-black text-white mb-3">Multi-Page AI Scanner</h1>
+                                            <p className="text-secondary fs-5 mb-5">Upload foto dokumen berapapun halamannya. AI Gemini 2.5 Flash akan membaca puluhan baris NIK, NISN, dan Pendamping otomatis.</p>
                                             
-                                            <input type="file" multiple accept="image/*" capture="environment" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
-                                            <button onClick={() => fileInputRef.current.click()} className="bg-brand-600 hover:bg-brand-500 text-white font-black text-xl py-6 px-16 rounded-[2rem] shadow-2xl shadow-brand-500/20 transition-all hover:-translate-y-2 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 mx-auto border border-brand-400">
-                                                <Icons.Scan className="w-6 h-6" /> Pilih Foto Dokumen
+                                            <input type="file" multiple accept="image/*" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
+                                            <button onClick={() => fileInputRef.current.click()} className="btn btn-brand btn-lg px-5 py-3 fs-5 rounded-pill shadow">
+                                                <i className="fas fa-camera me-2"></i> Pilih Foto Dokumen
                                             </button>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {(uploadState === 'processing_image' || uploadState === 'extracting' || uploadState === 'saving') && (
-                                    <div className="glass-card p-24 rounded-[3rem] text-center animate-slide-up">
-                                        <div className="mb-10"><span className="loader w-24 h-24 border-[6px]"></span></div>
-                                        <h2 className="text-3xl font-black text-white tracking-tight mb-4">
-                                            {uploadState === 'processing_image' ? `Optimalisasi ${fileInputRef.current?.files.length || 0} Gambar...` : 
-                                             uploadState === 'extracting' ? 'AI Mengekstrak Lintas Halaman...' : 
-                                             'Menyinkronkan ke Database Server...'}
-                                        </h2>
-                                        <p className="text-slate-400 text-lg font-medium">Proses ini menjamin akurasi data tabular hingga 99.9%.</p>
-                                    </div>
-                                )}
-
-                                {uploadState === 'form' && (
-                                    <div className="glass-card rounded-[3rem] overflow-hidden animate-slide-up">
-                                        <div className="bg-slate-900 px-12 py-10 border-b border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-4">
-                                            <div>
-                                                <h2 className="text-4xl font-black text-white tracking-tight">Verifikasi AI Data</h2>
-                                                <p className="text-brand-400 font-bold mt-2 text-sm uppercase tracking-widest">Berhasil Mengekstrak {processedImages.length} Halaman Foto.</p>
-                                            </div>
-                                            <div className="bg-slate-800 text-brand-400 px-6 py-3 rounded-2xl font-black text-xl border border-slate-700 shadow-inner">
-                                                {(extractedData.siswa || []).length} Baris Data
-                                            </div>
+                                    {(uploadState === 'processing_image' || uploadState === 'extracting' || uploadState === 'saving') && (
+                                        <div className="card-custom p-5 text-center">
+                                            <div className="spinner-border text-primary mb-4" role="status"></div>
+                                            <h2 className="fw-bold text-white mb-3">
+                                                {uploadState === 'processing_image' ? `Memproses ${fileInputRef.current?.files.length || 0} Gambar...` : 
+                                                 uploadState === 'extracting' ? 'AI Menyisir Baris Tabel...' : 
+                                                 'Menyimpan PDF & Database...'}
+                                            </h2>
+                                            <p className="text-secondary">Mohon tunggu, proses ini menjamin akurasi tinggi.</p>
                                         </div>
-                                        
-                                        <form onSubmit={handleSave} className="p-12 space-y-10">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-900/50 p-8 rounded-3xl border border-slate-800">
-                                                <div className="md:col-span-2">
-                                                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Asal Sekolah (Kop)</label>
-                                                    <div className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-6 py-5 text-white font-black text-xl">{extractedData.sekolah || 'Tidak Terdeteksi'}</div>
-                                                </div>
-                                                <div className="md:col-span-2">
-                                                    <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-3">Periode</label>
-                                                    <div className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-6 py-5 text-white font-black text-xl">{extractedData.bulan} {extractedData.tahun}</div>
-                                                </div>
+                                    )}
+
+                                    {uploadState === 'form' && (
+                                        <div className="card-custom overflow-hidden fade-in">
+                                            <div className="bg-dark p-4 border-bottom border-secondary border-opacity-50 d-flex justify-content-between align-items-center">
+                                                <h3 className="text-white fw-bold m-0"><i className="fas fa-check-double text-primary me-2"></i> Verifikasi Data AI</h3>
+                                                <span className="badge bg-primary fs-6 py-2 px-3 rounded-pill">{(extractedData.siswa || []).length} Baris Terbaca</span>
                                             </div>
                                             
-                                            <div>
-                                                <div className="flex items-center justify-between mb-5 mt-6 border-b border-slate-800 pb-4">
-                                                    <h3 className="text-lg font-black text-white uppercase tracking-tight">Tabel Data Siswa & Pendamping</h3>
+                                            <form onSubmit={handleSave} className="p-4 p-md-5">
+                                                <div className="row g-4 bg-dark bg-opacity-50 p-4 rounded-4 border border-secondary border-opacity-25 mb-4">
+                                                    <div className="col-12 col-md-6">
+                                                        <label className="form-label text-secondary fw-bold small text-uppercase">Nama Sekolah (Kop)</label>
+                                                        <div className="form-control bg-dark border-secondary border-opacity-25 text-white fw-bold fs-5 py-3">{extractedData.sekolah || '-'}</div>
+                                                    </div>
+                                                    <div className="col-12 col-md-6">
+                                                        <label className="form-label text-secondary fw-bold small text-uppercase">Periode</label>
+                                                        <div className="form-control bg-dark border-secondary border-opacity-25 text-white fw-bold fs-5 py-3">{extractedData.bulan} {extractedData.tahun}</div>
+                                                    </div>
                                                 </div>
-                                                <div className="max-h-[28rem] overflow-y-auto space-y-4 pr-3 custom-scrollbar p-2">
+                                                
+                                                <h5 className="text-white fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Tabel Data Siswa & Pendamping</h5>
+                                                <div className="overflow-auto custom-scrollbar pe-2 mb-4" style={{maxHeight: '400px'}}>
                                                     {(extractedData.siswa || []).map((s, i) => (
-                                                        <div key={i} className="bg-slate-900 p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row justify-between md:items-center gap-6 hover:border-brand-500 transition-colors group">
-                                                            <div className="flex-1">
-                                                                <div className="font-black text-white text-xl flex items-start gap-4">
-                                                                    <span className="bg-brand-600 text-white w-8 h-8 flex items-center justify-center rounded-xl text-sm shrink-0 shadow-lg">{i+1}</span> 
-                                                                    <span className="group-hover:text-brand-400 transition-colors leading-tight mt-1">{s.nama_siswa}</span>
+                                                        <div key={i} className="bg-dark bg-opacity-50 p-4 rounded-4 border border-secondary border-opacity-25 mb-3">
+                                                            <div className="row align-items-center g-3">
+                                                                <div className="col-12 col-lg-7">
+                                                                    <div className="d-flex align-items-start gap-3">
+                                                                        <span className="badge bg-secondary rounded-pill py-2 px-3 mt-1">{i+1}</span>
+                                                                        <div>
+                                                                            <h5 className="text-white fw-bold mb-1">{s.nama_siswa}</h5>
+                                                                            <div className="text-secondary small mb-2">NISN: <span className="text-white">{s.nisn}</span> | NIK: <span className="text-white">{s.nik_siswa}</span></div>
+                                                                            <div className="badge-brand d-inline-block"><i className="fas fa-user me-1"></i> PENDAMPING: {s.pendamping}</div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="text-sm text-slate-400 font-bold mt-4 ml-12">NISN: <span className="text-slate-300 bg-slate-800 px-2 py-1 rounded">{s.nisn}</span> &nbsp;&bull;&nbsp; NIK: <span className="text-slate-300 bg-slate-800 px-2 py-1 rounded">{s.nik_siswa}</span></div>
-                                                                <div className="text-sm text-brand-300 font-black mt-4 ml-12 bg-brand-900/30 border border-brand-800 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl"><Icons.User className="w-4 h-4 text-brand-400" /> PENDAMPING: {s.pendamping || 'Kosong'}</div>
-                                                            </div>
-                                                            <div className="text-left md:text-right ml-12 md:ml-0 flex flex-col justify-between h-full">
-                                                                <div className="inline-flex items-center justify-start md:justify-end gap-2 bg-slate-800 text-slate-300 px-4 py-2.5 rounded-xl text-sm font-black border border-slate-700 w-fit md:ml-auto">
-                                                                    <span>{s.bentuk}</span><span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span><span>{s.tingkat}</span>
+                                                                <div className="col-12 col-lg-5 text-lg-end">
+                                                                    <div className="badge bg-secondary text-white py-2 px-3 rounded-pill mb-2 border border-secondary border-opacity-50">
+                                                                        {s.bentuk} &bull; {s.tingkat}
+                                                                    </div>
+                                                                    <div className="text-secondary small bg-dark p-2 rounded border border-secondary border-opacity-25 d-inline-block mt-2 mt-lg-0">
+                                                                        Wali: <strong className="text-white">{s.nama_pengurus}</strong>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="text-xs text-slate-500 font-bold mt-5 bg-slate-950 p-2.5 rounded-lg border border-slate-800 inline-block">Wali/Pengurus: <strong className="text-slate-300 uppercase tracking-wide">{s.nama_pengurus}</strong></div>
                                                             </div>
                                                         </div>
                                                     ))}
-                                                    {(extractedData.siswa || []).length === 0 && (
-                                                        <div className="text-center py-16 flex flex-col items-center border border-dashed border-slate-700 rounded-3xl">
-                                                            <div className="text-slate-500 font-black text-xl">Tidak ada baris tabel yang terbaca.</div>
-                                                        </div>
-                                                    )}
+                                                    {(extractedData.siswa || []).length === 0 && <div className="text-center text-secondary py-5">Tidak ada data.</div>}
                                                 </div>
-                                            </div>
-                                            
-                                            <div className="flex flex-col sm:flex-row gap-5 pt-10 border-t border-slate-800 mt-10">
-                                                <button type="button" onClick={resetForm} className="px-10 py-6 bg-slate-800 hover:bg-slate-700 text-slate-300 font-black rounded-2xl transition-colors w-full sm:w-auto text-lg">Batalkan</button>
-                                                <button type="submit" className="flex-1 bg-brand-600 hover:bg-brand-500 text-white font-black text-xl py-6 px-10 rounded-2xl shadow-xl shadow-brand-500/20 transition-all hover:-translate-y-1 w-full sm:w-auto border border-brand-400">Integrasikan Data & PDF ke Server</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                )}
-
-                                {uploadState === 'success' && (
-                                    <div className="glass-card p-20 rounded-[3rem] text-center animate-slide-up relative overflow-hidden">
-                                        <div className="absolute top-0 left-0 w-full h-4 bg-emerald-500"></div>
-                                        <div className="flex justify-center mb-10"><Icons.Check className="w-24 h-24 text-emerald-400 bg-emerald-900/30 p-4 rounded-full border border-emerald-800" /></div>
-                                        <h2 className="text-5xl font-black text-white mb-6 tracking-tight">Sinkronisasi Berhasil!</h2>
-                                        <p className="text-slate-400 mb-14 text-xl font-medium max-w-lg mx-auto">Seluruh data tabel telah masuk ke Google Sheets dan file PDF telah diarsipkan dengan aman ke Google Drive.</p>
-                                        <div className="flex flex-col sm:flex-row justify-center gap-5">
-                                            <button onClick={resetForm} className="bg-slate-800 text-slate-300 font-black text-lg py-5 px-12 rounded-2xl hover:bg-slate-700 border border-slate-700">Scan Dokumen Lain</button>
-                                            <button onClick={() => setActiveTab('data_komponen')} className="bg-brand-600 text-white font-black text-lg py-5 px-12 rounded-2xl hover:bg-brand-500 border border-brand-400">Lihat Database Live</button>
+                                                
+                                                <div className="d-flex flex-column flex-sm-row gap-3 pt-4 border-top border-secondary border-opacity-50">
+                                                    <button type="button" onClick={resetForm} className="btn btn-light-custom btn-lg w-100">Batal</button>
+                                                    <button type="submit" className="btn btn-brand btn-lg w-100"><i className="fas fa-cloud-upload-alt me-2"></i> Simpan ke Server</button>
+                                                </div>
+                                            </form>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+
+                                    {uploadState === 'success' && (
+                                        <div className="card-custom p-5 text-center border-top border-success border-4 fade-in">
+                                            <i className="fas fa-check-circle text-success mx-auto mb-4" style={{fontSize: '5rem'}}></i>
+                                            <h2 className="text-white fw-black mb-3">Berhasil!</h2>
+                                            <p className="text-secondary mb-5 fs-5">Data berhasil dipecah menjadi database Spreadsheet dan PDF diarsipkan ke Google Drive.</p>
+                                            <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                                                <button onClick={resetForm} className="btn btn-light-custom btn-lg px-4">Upload Lain</button>
+                                                <button onClick={() => setActiveTab('data_komponen')} className="btn btn-brand btn-lg px-4">Lihat Database Live</button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
 
-                        {/* ========================================================= */}
-                        {/* 2. STATISTIK KOMPONEN */}
-                        {/* ========================================================= */}
-                        {activeTab === 'dashboard_komponen' && (
-                            <div className="animate-fade-in">
-                                <div className="mb-10 border-b border-slate-800 pb-6 flex items-end gap-5">
-                                    <div className="bg-brand-900/50 p-4 rounded-2xl border border-brand-800"><Icons.Chart className="w-8 h-8 text-brand-400" /></div>
-                                    <div>
-                                        <h2 className="text-4xl font-black text-white tracking-tight mb-2">Statistik Komponen</h2>
-                                        <p className="text-slate-400 text-lg font-medium">Dashboard analitik visualisasi data sekolah.</p>
-                                    </div>
-                                </div>
-                                
-                                {renderFilterBar()}
-                                
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                                    <div className="lg:col-span-1 space-y-8">
-                                        <div className="bg-gradient-to-br from-brand-600 to-indigo-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border border-brand-500">
-                                            <div className="relative z-10"><div className="text-brand-200 font-black uppercase tracking-widest text-sm mb-3">Total Siswa Tervalidasi</div><div className="text-[5.5rem] leading-none font-black">{filteredKomponen.length}</div></div>
-                                            <div className="absolute -right-10 -bottom-10 opacity-20 text-[12rem] pointer-events-none">📈</div>
-                                        </div>
-                                        <div className="glass-card rounded-[2.5rem] p-8">
-                                            <h3 className="font-black text-white mb-6 text-xl flex items-center gap-3"><Icons.User className="w-6 h-6 text-brand-400"/> Top Pendamping</h3>
-                                            <div className="space-y-4 max-h-[22rem] overflow-y-auto custom-scrollbar pr-2">
-                                                {Object.entries(aggregatePendamping).sort((a,b) => b[1] - a[1]).map(([key, val], idx) => (
-                                                    <div key={key} className="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
-                                                        <div className="flex items-center gap-3"><span className="text-xs font-black text-slate-500 w-5">{idx+1}.</span><span className="font-bold text-slate-300 truncate max-w-[150px]">{key}</span></div>
-                                                        <span className="bg-slate-800 px-4 py-2 rounded-xl text-sm font-black text-brand-400 border border-slate-700">{val} Siswa</span>
-                                                    </div>
-                                                ))}
-                                                {Object.keys(aggregatePendamping).length === 0 && <div className="text-slate-400 text-sm text-center py-4 font-bold">Data Kosong</div>}
+                        {/* FILTER BAR GLOBAL (RENDER FUNCTION) */}
+                        {(() => {
+                            if(activeTab === 'dashboard_komponen' || activeTab === 'data_komponen') {
+                                return (
+                                    <div className="card-custom p-4 mb-5 fade-in">
+                                        <div className="row g-3">
+                                            <div className="col-12 col-md-3">
+                                                <div className="input-group">
+                                                    <span className="input-group-text bg-dark border-secondary border-opacity-50 text-secondary"><i className="fas fa-search"></i></span>
+                                                    <input type="text" className="form-control" placeholder="Cari nama, NISN..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} />
+                                                </div>
+                                            </div>
+                                            <div className="col-12 col-md-3">
+                                                <select className="form-select" value={filterPendamping} onChange={e=>setFilterPendamping(e.target.value)}>
+                                                    <option value="">Semua Pendamping</option>
+                                                    {optionsPendamping.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="col-12 col-md-3">
+                                                <select className="form-select" value={filterBentuk} onChange={e=>setFilterBentuk(e.target.value)}>
+                                                    <option value="">Semua Jenjang</option>
+                                                    {optionsBentuk.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
+                                                </select>
+                                            </div>
+                                            <div className="col-12 col-md-3">
+                                                <select className="form-select" value={filterTingkat} onChange={e=>setFilterTingkat(e.target.value)}>
+                                                    <option value="">Semua Kelas</option>
+                                                    {optionsTingkat.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
+                                );
+                            }
+                            return null;
+                        })()}
 
-                                    <div className="lg:col-span-2 glass-card rounded-[2.5rem] p-10 flex flex-col">
-                                        <h3 className="font-black text-white mb-8 text-2xl flex items-center gap-3 border-b border-slate-800 pb-6"><Icons.Database className="w-8 h-8 text-brand-400"/> Distribusi Jenjang & Kelas</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 overflow-y-auto custom-scrollbar pr-2 flex-1">
-                                            {Object.entries(aggregateBentukTingkat).sort((a, b) => String(a[0]).localeCompare(String(b[0]))).map(([bentuk, tingkatData]) => (
-                                                <div key={bentuk} className="bg-slate-900 border border-slate-800 p-8 rounded-3xl relative overflow-hidden h-fit shadow-inner">
-                                                    <div className="relative z-10">
-                                                        <div className="flex justify-between items-end mb-8 border-b border-slate-800 pb-5">
-                                                            <span className="font-black text-white text-[2.5rem] leading-none tracking-tight">{bentuk}</span>
-                                                            <span className="bg-brand-900/50 text-brand-300 px-5 py-2.5 rounded-xl text-sm font-black border border-brand-800">Total: {Object.values(tingkatData).reduce((a, b) => a + b, 0)}</span>
-                                                        </div>
-                                                        <div className="space-y-4">
-                                                            {Object.entries(tingkatData).sort((a, b) => String(a[0]).localeCompare(String(b[0]))).map(([tingkat, count]) => (
-                                                                <div key={tingkat} className="flex justify-between items-center bg-slate-950 p-4 rounded-xl border border-slate-800">
-                                                                    <span className="text-slate-400 font-bold">{tingkat}</span><span className="font-black text-white text-2xl bg-slate-800 px-4 py-1.5 rounded-lg border border-slate-700">{count}</span>
+                        {/* 2. STATISTIK */}
+                        {activeTab === 'dashboard_komponen' && (
+                            <div className="fade-in">
+                                <div className="d-flex align-items-center gap-3 mb-4 border-bottom border-secondary border-opacity-50 pb-3">
+                                    <div className="bg-primary text-white p-3 rounded-4"><i className="fas fa-chart-bar fs-4"></i></div>
+                                    <div><h2 className="text-white fw-bold m-0">Statistik Data</h2></div>
+                                </div>
+                                
+                                <div className="row g-4">
+                                    <div className="col-12 col-lg-4 d-flex flex-column gap-4">
+                                        <div className="card card-stats p-4 rounded-4 shadow h-100 justify-content-center">
+                                            <div className="text-white-50 fw-bold text-uppercase mb-2">Total Siswa</div>
+                                            <div className="display-3 fw-black">{filteredKomponen.length}</div>
+                                            <i className="fas fa-users position-absolute opacity-25" style={{fontSize:'8rem', right:'-20px', bottom:'-20px'}}></i>
+                                        </div>
+                                        <div className="card card-custom p-4 rounded-4 shadow h-100">
+                                            <h5 className="text-white fw-bold mb-4 border-bottom border-secondary border-opacity-50 pb-2">Top Surveyor</h5>
+                                            <div className="overflow-auto custom-scrollbar pe-2" style={{maxHeight:'250px'}}>
+                                                {Object.entries(aggregatePendamping).sort((a,b)=>b[1]-a[1]).map(([k,v], i) => (
+                                                    <div key={k} className="d-flex justify-content-between align-items-center bg-dark p-3 rounded-3 mb-2 border border-secondary border-opacity-25">
+                                                        <span className="text-white text-truncate me-2"><span className="text-secondary me-2">{i+1}.</span>{k}</span>
+                                                        <span className="badge bg-primary rounded-pill py-2 px-3">{v}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-lg-8">
+                                        <div className="card card-custom p-4 p-md-5 rounded-4 shadow h-100">
+                                            <h4 className="text-white fw-bold mb-4 border-bottom border-secondary border-opacity-50 pb-3">Distribusi Jenjang & Kelas</h4>
+                                            <div className="row g-4">
+                                                {Object.entries(aggregateBentukTingkat).map(([bentuk, data]) => (
+                                                    <div key={bentuk} className="col-12 col-md-6">
+                                                        <div className="bg-dark p-4 rounded-4 border border-secondary border-opacity-25 h-100">
+                                                            <div className="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary border-opacity-25 pb-3">
+                                                                <h2 className="text-primary fw-black m-0">{bentuk}</h2>
+                                                                <span className="badge bg-secondary border border-secondary">{Object.values(data).reduce((a,b)=>a+b,0)} Total</span>
+                                                            </div>
+                                                            {Object.entries(data).map(([t, c]) => (
+                                                                <div key={t} className="d-flex justify-content-between align-items-center bg-black bg-opacity-25 p-3 rounded-3 mb-2">
+                                                                    <span className="text-secondary fw-bold">{t}</span>
+                                                                    <span className="text-white fw-bold bg-dark px-3 py-1 rounded">{c}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* ========================================================= */}
-                        {/* 3. DATA KOMPONEN / DATABASE                               */}
-                        {/* ========================================================= */}
+                        {/* 3. DATABASE */}
                         {activeTab === 'data_komponen' && (
-                            <div className="animate-fade-in flex flex-col h-[85vh]">
-                                <div className="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                                    <div className="flex items-center gap-5">
-                                        <div className="bg-emerald-900/40 p-4 rounded-2xl border border-emerald-800"><Icons.Database className="w-8 h-8 text-emerald-400" /></div>
-                                        <div><h2 className="text-4xl font-black text-white tracking-tight mb-2">Live Database</h2><p className="text-slate-400 text-lg font-medium">Tabel komprehensif data siswa, tersinkronisasi otomatis dengan Google Sheets.</p></div>
+                            <div className="fade-in d-flex flex-column" style={{height:'75vh'}}>
+                                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom border-secondary border-opacity-50 pb-3">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <div className="bg-success text-white p-3 rounded-4"><i className="fas fa-database fs-4"></i></div>
+                                        <h2 className="text-white fw-bold m-0">Live Database</h2>
                                     </div>
-                                    <div className="flex gap-4">
-                                        <button onClick={exportToExcel} className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white text-sm font-black py-4 px-6 rounded-2xl transition-colors"><Icons.Excel className="w-5 h-5"/> Ekspor Excel</button>
-                                        <button onClick={exportToPDF} className="flex items-center gap-3 bg-rose-600 hover:bg-rose-500 border border-rose-400 text-white text-sm font-black py-4 px-6 rounded-2xl transition-colors"><Icons.PDF className="w-5 h-5"/> Cetak PDF</button>
+                                    <div className="d-flex gap-2">
+                                        <button onClick={exportToExcel} className="btn btn-outline-success fw-bold"><i className="fas fa-file-excel me-2"></i>Excel</button>
+                                        <button onClick={exportToPDF} className="btn btn-outline-danger fw-bold"><i className="fas fa-file-pdf me-2"></i>PDF</button>
                                     </div>
                                 </div>
-                                
-                                {renderFilterBar()}
-                                
-                                <div className="glass-card rounded-[2.5rem] overflow-hidden flex-1 flex flex-col">
-                                    <div className="overflow-auto flex-1 p-0 custom-scrollbar">
-                                        <table className="w-full text-left text-sm whitespace-nowrap">
-                                            <thead className="bg-slate-900 text-slate-400 font-black uppercase tracking-widest text-[11px] sticky top-0 z-10 border-b border-slate-800">
-                                                <tr><th className="px-8 py-7">Siswa & NISN</th><th className="px-8 py-7">Jenjang & Kelas</th><th className="px-8 py-7">Pengurus (NIK)</th><th className="px-8 py-7">Sekolah</th><th className="px-8 py-7">Pendamping & Berkas</th></tr>
+
+                                <div className="card-custom rounded-4 flex-grow-1 overflow-hidden d-flex flex-column shadow">
+                                    <div className="table-responsive flex-grow-1 custom-scrollbar">
+                                        <table className="table table-dark table-hover mb-0">
+                                            <thead className="sticky-top" style={{zIndex:10}}>
+                                                <tr><th className="p-4">Identitas Siswa (NISN)</th><th className="p-4">Jenjang / Kelas</th><th className="p-4">Pengurus (NIK)</th><th className="p-4">Asal Sekolah</th><th className="p-4">Pendamping & Berkas</th></tr>
                                             </thead>
-                                            <tbody className="divide-y divide-slate-800/80 bg-slate-900/50">
-                                                {loadingData ? (
-                                                    <tr><td colSpan="5" className="text-center py-32"><span className="loader w-12 h-12 border-[5px]"></span><div className="mt-4 font-bold text-slate-500">Membaca dari server...</div></td></tr>
-                                                ) : filteredKomponen.length === 0 ? (
-                                                    <tr><td colSpan="5" className="text-center py-32 text-slate-500 font-black text-2xl">Tidak ada data ditemukan.</td></tr>
-                                                ) : (
-                                                    filteredKomponen.map((item, idx) => (
-                                                        <tr key={idx} className="hover:bg-slate-800/50 transition-colors">
-                                                            <td className="px-8 py-6">
-                                                                <div className="font-black text-white text-lg">{item.nama_siswa}</div>
-                                                                <div className="text-xs text-slate-400 font-bold mt-2 bg-slate-950 inline-block px-3 py-1.5 rounded-md border border-slate-800">NISN: {item.nisn} | NIK: {item.nik_siswa}</div>
-                                                            </td>
-                                                            <td className="px-8 py-6"><span className="inline-flex items-center gap-2 py-2 px-4 rounded-xl text-xs font-black bg-slate-800 text-slate-300 border border-slate-700">{item.bentuk} <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span> {item.tingkat}</span></td>
-                                                            <td className="px-8 py-6">
-                                                                <div className="font-bold text-slate-300 uppercase tracking-tight">{item.nama_pengurus}</div>
-                                                                <div className="text-xs text-slate-500 font-bold mt-2 font-mono tracking-wider">{item.nik_pengurus}</div>
-                                                            </td>
-                                                            <td className="px-8 py-6">
-                                                                <div className="font-bold text-slate-200 max-w-[200px] truncate" title={item.sekolah}>{item.sekolah}</div>
-                                                                <div className="text-xs text-slate-500 font-bold mt-2 flex items-center gap-1.5"><Icons.Archive className="w-3 h-3"/> {item.bulan} {item.tahun}</div>
-                                                            </td>
-                                                            <td className="px-8 py-6">
-                                                                <div className="font-black text-brand-400 mb-3 flex items-center gap-2 bg-brand-900/20 px-3 py-1.5 rounded-lg w-fit border border-brand-900/50"><Icons.User className="w-4 h-4"/> {item.pendamping}</div>
-                                                                {item.url && item.url !== '#' ? <a href={item.url} target="_blank" rel="noreferrer" className="bg-slate-800 border border-slate-700 text-slate-300 py-2.5 px-5 rounded-xl font-black hover:bg-slate-700 hover:text-white text-xs transition-colors flex items-center gap-2 w-fit"><Icons.PDF className="w-4 h-4 text-rose-400"/> Buka Scan Asli</a> : <span className="text-xs text-slate-500 font-bold bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-800">No PDF</span>}
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                )}
+                                            <tbody>
+                                                {loadingData ? <tr><td colSpan="5" className="text-center py-5"><div className="spinner-border text-primary"></div></td></tr> :
+                                                 filteredKomponen.length===0 ? <tr><td colSpan="5" className="text-center text-secondary py-5">Kosong</td></tr> :
+                                                 filteredKomponen.map((r,i) => (
+                                                    <tr key={i}>
+                                                        <td className="p-4"><div className="fw-bold text-white fs-6">{r.nama_siswa}</div><div className="text-secondary small mt-1"><span className="bg-dark px-2 py-1 rounded">NISN: {r.nisn}</span></div></td>
+                                                        <td className="p-4"><span className="badge bg-secondary text-white py-2 px-3 border border-secondary border-opacity-50">{r.bentuk} &bull; {r.tingkat}</span></td>
+                                                        <td className="p-4"><div className="text-white fw-bold">{r.nama_pengurus}</div><div className="text-secondary font-monospace small">{r.nik_pengurus}</div></td>
+                                                        <td className="p-4"><div className="text-white">{r.sekolah}</div><div className="text-secondary small mt-1"><i className="far fa-calendar-alt me-1"></i> {r.bulan} {r.tahun}</div></td>
+                                                        <td className="p-4">
+                                                            <div className="badge-brand d-inline-block mb-2"><i className="fas fa-user me-1"></i> {r.pendamping}</div><br/>
+                                                            {r.url!=='#' ? <a href={r.url} target="_blank" className="btn btn-sm btn-outline-danger fw-bold"><i className="fas fa-file-pdf me-1"></i> Buka Scan</a> : <span className="badge bg-dark text-secondary">No File</span>}
+                                                        </td>
+                                                    </tr>
+                                                 ))
+                                                }
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="bg-slate-950 border-t border-slate-800 px-8 py-5 text-sm font-bold text-slate-500 flex justify-between"><span>Total: {filteredKomponen.length} Baris Data</span><span>Status: Live Connected</span></div>
+                                    <div className="bg-dark p-3 border-top border-secondary border-opacity-25 d-flex justify-content-between text-secondary small fw-bold">
+                                        <span>Total Baris: {filteredKomponen.length}</span><span>Synced <i className="fas fa-cloud text-success"></i></span>
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* ========================================================= */}
-                        {/* 4. DASHBOARD ARSIP                                        */}
-                        {/* ========================================================= */}
+                        {/* 4. DASHBOARD ARSIP */}
                         {activeTab === 'dashboard_arsip' && (
-                            <div className="animate-fade-in">
-                                <div className="mb-10 border-b border-slate-800 pb-6 flex items-end gap-5">
-                                    <div className="bg-rose-900/30 p-4 rounded-2xl border border-rose-800/50"><Icons.Archive className="w-8 h-8 text-rose-400" /></div>
-                                    <div><h2 className="text-4xl font-black text-white tracking-tight mb-2">Dashboard Arsip</h2><p className="text-slate-400 text-lg font-medium">Monitoring status dokumen form fisik PDF.</p></div>
+                            <div className="fade-in">
+                                <div className="d-flex align-items-center gap-3 mb-5 border-bottom border-secondary border-opacity-50 pb-3">
+                                    <div className="bg-danger text-white p-3 rounded-4"><i className="fas fa-folder-open fs-4"></i></div>
+                                    <h2 className="text-white fw-bold m-0">Dashboard Arsip</h2>
                                 </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                                    <div className="glass-card rounded-[2.5rem] p-10 flex items-center gap-8 group">
-                                        <div className="w-20 h-20 rounded-[1.5rem] bg-rose-900/30 text-rose-400 flex items-center justify-center border border-rose-800/50"><Icons.PDF className="w-10 h-10"/></div>
-                                        <div><div className="text-sm text-slate-500 font-black uppercase tracking-widest mb-2">Total PDF File</div><div className="text-5xl font-black text-white">{arsipUnik.length}</div></div>
+                                <div className="row g-4">
+                                    <div className="col-12 col-md-4">
+                                        <div className="card-custom p-4 p-lg-5 rounded-4 shadow text-center border-top border-danger border-4">
+                                            <i className="fas fa-file-pdf text-danger fs-1 mb-3"></i>
+                                            <div className="text-secondary fw-bold text-uppercase mb-2">Total Dokumen PDF</div>
+                                            <div className="display-4 fw-black text-white">{arsipUnik.length}</div>
+                                        </div>
                                     </div>
-                                    <div className="glass-card rounded-[2.5rem] p-10 flex items-center gap-8 group">
-                                        <div className="w-20 h-20 rounded-[1.5rem] bg-blue-900/30 text-blue-400 flex items-center justify-center border border-blue-800/50"><Icons.Archive className="w-10 h-10"/></div>
-                                        <div><div className="text-sm text-slate-500 font-black uppercase tracking-widest mb-2">Sekolah Valid</div><div className="text-5xl font-black text-white">{totalSekolahUnik}</div></div>
+                                    <div className="col-12 col-md-4">
+                                        <div className="card-custom p-4 p-lg-5 rounded-4 shadow text-center border-top border-primary border-4">
+                                            <i className="fas fa-school text-primary fs-1 mb-3"></i>
+                                            <div className="text-secondary fw-bold text-uppercase mb-2">Sekolah Tervalidasi</div>
+                                            <div className="display-4 fw-black text-white">{totalSekolahUnik}</div>
+                                        </div>
                                     </div>
-                                    <div className="glass-card rounded-[2.5rem] p-10 flex items-center gap-8 group">
-                                        <div className="w-20 h-20 rounded-[1.5rem] bg-emerald-900/30 text-emerald-400 flex items-center justify-center border border-emerald-800/50"><Icons.User className="w-10 h-10"/></div>
-                                        <div><div className="text-sm text-slate-500 font-black uppercase tracking-widest mb-2">Petugas Scan</div><div className="text-5xl font-black text-white">{totalPendampingAktif}</div></div>
+                                    <div className="col-12 col-md-4">
+                                        <div className="card-custom p-4 p-lg-5 rounded-4 shadow text-center border-top border-success border-4">
+                                            <i className="fas fa-id-badge text-success fs-1 mb-3"></i>
+                                            <div className="text-secondary fw-bold text-uppercase mb-2">Petugas Terlibat</div>
+                                            <div className="display-4 fw-black text-white">{totalPendampingAktif}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* ========================================================= */}
-                        {/* 5. ARSIP PDF DIGITAL                                      */}
-                        {/* ========================================================= */}
+                        {/* 5. ARSIP PDF DIGITAL */}
                         {activeTab === 'arsip_pdf' && (
-                            <div className="animate-fade-in">
-                                <div className="mb-10 border-b border-slate-800 pb-6 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                                    <div className="flex items-center gap-5">
-                                        <div className="bg-slate-800 p-4 rounded-2xl border border-slate-700"><Icons.PDF className="w-8 h-8 text-white" /></div>
-                                        <div><h2 className="text-4xl font-black text-white tracking-tight mb-2">Arsip PDF Cloud</h2><p className="text-slate-400 text-lg font-medium">Buka hasil scan fisik yang tersimpan di Google Drive.</p></div>
+                            <div className="fade-in">
+                                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 border-bottom border-secondary border-opacity-50 pb-4">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <div className="bg-secondary text-white p-3 rounded-4"><i className="fas fa-file-pdf fs-4"></i></div>
+                                        <h2 className="text-white fw-bold m-0">Arsip Scan Dokumen</h2>
                                     </div>
-                                    <div className="relative w-full md:w-[28rem]">
-                                        <Icons.Search className="absolute left-6 top-4.5 text-slate-500 w-5 h-5 mt-0.5" />
-                                        <input type="text" placeholder="Cari nama sekolah atau petugas..." value={searchArsip} onChange={e => setSearchArsip(e.target.value)} className="w-full pl-16 pr-6 py-4 bg-slate-900 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none text-white font-bold placeholder-slate-600" />
+                                    <div className="input-group" style={{maxWidth: '400px'}}>
+                                        <span className="input-group-text bg-dark border-secondary border-opacity-50 text-secondary"><i className="fas fa-search"></i></span>
+                                        <input type="text" className="form-control" placeholder="Cari sekolah, petugas..." value={searchArsip} onChange={e=>setSearchArsip(e.target.value)} />
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 pb-10">
-                                    {loadingData ? (
-                                        <div className="col-span-full text-center py-20"><span className="loader w-16 h-16"></span></div>
-                                    ) : filteredArsip.length === 0 ? (
-                                        <div className="col-span-full text-center py-32 bg-slate-900 rounded-[3rem] border border-dashed border-slate-700">
-                                            <Icons.Archive className="w-20 h-20 text-slate-700 mx-auto mb-6" />
-                                            <div className="text-3xl font-black text-slate-600">Tidak ada PDF yang ditemukan.</div>
-                                        </div>
-                                    ) : (
-                                        filteredArsip.map((item, idx) => (
-                                            <div key={idx} className="glass-card rounded-[2.5rem] p-8 hover:-translate-y-2 hover:border-brand-500 transition-all duration-500 flex flex-col justify-between h-full group">
-                                                <div>
-                                                    <div className="flex justify-between items-start mb-8">
-                                                        <div className="p-4 bg-rose-900/20 text-rose-500 rounded-2xl group-hover:bg-rose-500 group-hover:text-white transition-colors duration-500 border border-rose-900/50 group-hover:border-rose-400"><Icons.PDF className="w-8 h-8" /></div>
-                                                        <span className="text-xs bg-slate-800 border border-slate-700 text-slate-300 px-4 py-2 rounded-xl font-black tracking-widest uppercase">{item.bulan} {item.tahun}</span>
-                                                    </div>
-                                                    <h3 className="font-black text-white text-xl mb-4 leading-snug line-clamp-3 group-hover:text-brand-400 transition-colors">{item.sekolah}</h3>
-                                                    <div className="text-sm text-slate-400 font-bold flex items-center gap-3 mt-6 bg-slate-900 p-3.5 rounded-xl border border-slate-800"><Icons.User className="w-5 h-5 text-brand-500"/> <span className="truncate">{item.pendamping}</span></div>
+                                <div className="row g-4 pb-5">
+                                    {loadingData ? <div className="col-12 text-center py-5"><div className="spinner-border text-danger"></div></div> : 
+                                     filteredArsip.length===0 ? <div className="col-12 text-center py-5 text-secondary"><i className="fas fa-folder-open fs-1 mb-3"></i><h5>Arsip Kosong</h5></div> :
+                                     filteredArsip.map((item, i) => (
+                                        <div key={i} className="col-12 col-md-6 col-lg-4 col-xl-3">
+                                            <div className="card-custom p-4 rounded-4 shadow h-100 d-flex flex-column hover-shadow transition" style={{transition: 'transform 0.3s', cursor: 'pointer'}} onMouseOver={e=>e.currentTarget.style.transform='translateY(-5px)'} onMouseOut={e=>e.currentTarget.style.transform='translateY(0)'}>
+                                                <div className="d-flex justify-content-between align-items-start mb-4">
+                                                    <div className="bg-danger bg-opacity-10 p-3 rounded-3 border border-danger border-opacity-25 text-danger"><i className="fas fa-file-pdf fs-4"></i></div>
+                                                    <span className="badge bg-dark border border-secondary border-opacity-50 text-secondary py-2">{item.bulan} {item.tahun}</span>
                                                 </div>
-                                                <div className="mt-8 pt-6 border-t border-slate-800">
-                                                    {item.url && item.url !== '#' ? (
-                                                        <a href={item.url} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 w-full bg-brand-600 text-white hover:bg-brand-500 text-sm font-black py-4 rounded-2xl transition-colors shadow-lg border border-brand-400">
-                                                            <Icons.PDF className="w-5 h-5"/> Buka File PDF
-                                                        </a>
-                                                    ) : (
-                                                        <button disabled className="block text-center w-full bg-slate-800 border border-slate-700 text-slate-500 text-sm font-black py-4 rounded-2xl cursor-not-allowed">Simulasi Lokal</button>
-                                                    )}
+                                                <h5 className="text-white fw-bold mb-3 lh-base">{item.sekolah}</h5>
+                                                <div className="bg-dark p-2 rounded text-secondary small fw-bold mb-4 border border-secondary border-opacity-25"><i className="fas fa-user text-primary me-2"></i>{item.pendamping}</div>
+                                                <div className="mt-auto">
+                                                    {item.url!=='#' ? <a href={item.url} target="_blank" className="btn btn-outline-danger w-100 fw-bold"><i className="fas fa-external-link-alt me-2"></i> Buka PDF</a> : <button disabled className="btn btn-dark w-100 text-secondary">Offline</button>}
                                                 </div>
                                             </div>
-                                        ))
-                                    )}
+                                        </div>
+                                     ))
+                                    }
                                 </div>
                             </div>
                         )}
