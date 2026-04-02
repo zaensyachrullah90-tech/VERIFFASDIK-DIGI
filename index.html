@@ -35,7 +35,7 @@
         .card-custom { background-color: #111827; border: 1px solid #1e293b; border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         .card-stats { background: linear-gradient(135deg, #0284c7, #1e3a8a); border: none; color: white; }
         
-        .nav-pills .nav-link { color: #94a3b8; border-radius: 1rem; padding: 10px 20px; font-weight: 600; transition: all 0.3s; }
+        .nav-pills .nav-link { color: #94a3b8; border-radius: 1rem; padding: 10px 20px; font-weight: 600; transition: all 0.3s; cursor: pointer; border: none; background: transparent; }
         .nav-pills .nav-link:hover { background-color: #1e293b; color: #f8fafc; }
         .nav-pills .nav-link.active { background-color: #2563eb; color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); }
         
@@ -352,21 +352,27 @@
             // LOGIKA EXPORT (EXCEL & PDF)
             // =====================================================================================
             const exportToExcel = () => {
-                if (filteredKomponen.length === 0) return showToast("Tidak ada data", 'error');
-                const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data");
-                XLSX.writeFile(wb, `Data_Komponen_${new Date().getTime()}.xlsx`);
+                if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
+                if (!window.XLSX) return showToast("Library Excel gagal dimuat.", 'error');
+                try {
+                    const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data");
+                    XLSX.writeFile(wb, `Data_Komponen_${new Date().getTime()}.xlsx`);
+                } catch (e) { showToast("Gagal mengekspor Excel", "error"); }
             };
 
             const exportToPDF = () => {
-                if (filteredKomponen.length === 0) return showToast("Tidak ada data", 'error');
-                const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
-                doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Verifikasi", 14, 15);
-                doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total: ${filteredKomponen.length} Siswa`, 14, 22);
-                const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
-                doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [37, 99, 235] }});
-                doc.save(`Laporan_${new Date().getTime()}.pdf`);
+                if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk dicetak", 'error');
+                if (!window.jspdf || !window.jspdf.jsPDF) return showToast("Library PDF gagal dimuat.", 'error');
+                try {
+                    const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Verifikasi", 14, 15);
+                    doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total: ${filteredKomponen.length} Siswa`, 14, 22);
+                    const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
+                    doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [37, 99, 235] }});
+                    doc.save(`Laporan_${new Date().getTime()}.pdf`);
+                } catch (e) { showToast("Gagal mencetak PDF", "error"); }
             };
 
             // =====================================================================================
