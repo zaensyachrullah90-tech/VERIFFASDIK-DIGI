@@ -14,9 +14,9 @@
     </script>
     
     <!-- Core React Libraries -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
     
     <!-- Export Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -45,9 +45,9 @@
 
     <script type="text/babel">
         // =========================================================================
-        // URL WEB APP GAS (KOSONGKAN UNTUK MODE SIMULASI UJI COBA LOKAL)
+        // URL WEB APP GAS (TELAH DIISI SESUAI PERMINTAAN)
         // =========================================================================
-        const GAS_WEB_APP_URL = ""; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw-Ez4pHMQ7aZycAoF9-Pz-p9bEmSBc0LSQuAQwdvFMntdwQ24_5rRSZ0KQVUgQbFzF/exec"; 
 
         const { useState, useEffect, useRef } = React;
 
@@ -63,15 +63,15 @@
             PDF: (p) => <svg {...p} width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15v-4"/><path d="M12 15v-4"/><path d="M15 15v-4"/></svg>,
             Excel: (p) => <svg {...p} width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2"/><path d="M8 17h2"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>,
             Pages: (p) => <svg {...p} width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M16 22H4a2 2 0 0 1-2-2V6"/></svg>,
-            User: (p) => <svg {...p} width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            User: (p) => <svg {...p} width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+            Settings: (p) => <svg {...p} width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         };
 
-        // --- Komponen Notifikasi ---
         const Toast = ({ message, type, onClose }) => {
-            useEffect(() => { const timer = setTimeout(onClose, 4000); return () => clearTimeout(timer); }, [onClose]);
-            const bg = type === 'error' ? 'bg-red-600' : 'bg-emerald-600';
+            useEffect(() => { const timer = setTimeout(onClose, 5000); return () => clearTimeout(timer); }, [onClose]);
+            const bg = type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-emerald-600' : 'bg-slate-800';
             return (
-                <div className={`fixed bottom-4 right-4 z-50 ${bg} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-up max-w-md`}>
+                <div className={`fixed bottom-4 right-4 z-[99] ${bg} text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 animate-slide-up max-w-md`}>
                     {type === 'success' && <Icons.Check className="w-5 h-5 text-white" />}
                     <span className="font-semibold text-sm break-words">{message}</span>
                 </div>
@@ -81,18 +81,21 @@
         function App() {
             const [activeTab, setActiveTab] = useState('upload'); 
             
+            // SYSTEM CONFIG (LOCAL STORAGE WITH DEFAULT)
+            const [showSettings, setShowSettings] = useState(false);
+            const [backendUrl, setBackendUrl] = useState(localStorage.getItem('VERIFDIGI_BACKEND_URL') || GAS_WEB_APP_URL);
+            const [tempUrl, setTempUrl] = useState(backendUrl);
+
             // STATE UPLOAD
             const [uploadState, setUploadState] = useState('idle');
             const [processedImages, setProcessedImages] = useState([]);
-            // Inisialisasi aman anti-crash
             const [extractedData, setExtractedData] = useState({ sekolah: '', bulan: '', tahun: '', siswa: [] });
             
-            // STATE DATABASE
+            // STATE DATA & FILTER
             const [records, setRecords] = useState([]);
             const [loadingData, setLoadingData] = useState(false);
             const [toast, setToast] = useState(null);
             
-            // STATE FILTER
             const [filterPendamping, setFilterPendamping] = useState('');
             const [filterBentuk, setFilterBentuk] = useState('');
             const [filterTingkat, setFilterTingkat] = useState('');
@@ -105,15 +108,28 @@
             const showToast = (message, type = 'success') => setToast({ message, type });
 
             useEffect(() => {
-                if (activeTab !== 'upload' && records.length === 0) fetchData();
+                if (activeTab !== 'upload' && activeTab !== 'settings' && records.length === 0) fetchData();
             }, [activeTab]);
 
+            // Save Settings
+            const saveSettings = () => {
+                localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl);
+                setBackendUrl(tempUrl);
+                setShowSettings(false);
+                showToast('URL Backend berhasil disimpan!', 'success');
+            };
+
             // ==========================================
-            // PROSES GAMBAR LINTAS HALAMAN
+            // MULTI-IMAGE OCR & PROCESSING
             // ==========================================
             const handleFileChange = async (e) => {
                 const files = Array.from(e.target.files || []);
                 if (files.length === 0) return;
+                
+                if (!backendUrl) {
+                    setShowSettings(true);
+                    return showToast('PENTING: Harap masukkan URL Backend Google Apps Script terlebih dahulu!', 'error');
+                }
                 
                 setUploadState('processing_image');
                 const base64Array = [];
@@ -154,42 +170,27 @@
                 setUploadState('extracting');
                 try {
                     const cleanBase64Array = base64Array.map(img => img.split(',')[1]);
-                    let data;
                     
-                    if (GAS_WEB_APP_URL === "") {
-                        // MODE SIMULASI LOKAL 
-                        await new Promise(r => setTimeout(r, 2000));
-                        data = { 
-                            status: 'success', 
-                            data: { 
-                                sekolah: 'SD NEGERI RANGDA MALINGKUNG 4', bulan: 'JANUARI', tahun: '2026', 
-                                siswa: [
-                                    { nik_pengurus: '6305094703880001', nama_pengurus: 'ELY SRILESTARI', nik_siswa: '6305043004180001', nisn: '3187240495', nama_siswa: 'ABDUL GHANI BAYHAKI', bentuk: 'SD', tingkat: 'Kelas 2', pendamping: 'M ZAEN SYACHRULLAH' },
-                                    { nik_pengurus: '1234567890123456', nama_pengurus: 'BUDI SANTOSO', nik_siswa: '0987654321098765', nisn: '11223344', nama_siswa: 'CITRA LESTARI', bentuk: 'SD', tingkat: 'Kelas 3', pendamping: 'M ZAEN SYACHRULLAH' }
-                                ]
-                            } 
-                        };
-                    } else {
-                        const res = await fetch(GAS_WEB_APP_URL, {
-                            method: 'POST', body: JSON.stringify({ action: 'extract_multiple', images: cleanBase64Array }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                        });
-                        data = await res.json();
-                    }
+                    const res = await fetch(backendUrl, {
+                        method: 'POST', body: JSON.stringify({ action: 'extract_multiple', images: cleanBase64Array }), headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                    });
+                    
+                    const data = await res.json();
 
                     if (data.status === 'success') {
-                        // Validasi anti-crash jika AI mengembalikan data kosong
+                        // Anti-Crash Data Parse
                         const safeData = {
                             sekolah: data.data.sekolah || '',
                             bulan: data.data.bulan || '',
                             tahun: data.data.tahun || '',
-                            siswa: data.data.siswa && Array.isArray(data.data.siswa) ? data.data.siswa : [] 
+                            siswa: Array.isArray(data.data.siswa) ? data.data.siswa : [] 
                         };
                         setExtractedData(safeData);
                         setUploadState('form');
-                        showToast(`Berhasil membaca ${safeData.siswa.length} baris tabel!`, 'success');
+                        showToast(`Berhasil membaca ${safeData.siswa.length} baris data dari foto!`, 'success');
                     } else throw new Error(data.message);
                 } catch (err) {
-                    showToast('Gagal membaca dokumen: ' + err.message, 'error');
+                    showToast('Gagal terhubung ke AI/Backend: ' + err.message, 'error');
                     setUploadState('idle');
                 }
             };
@@ -199,10 +200,9 @@
                 setUploadState('saving');
 
                 try {
-                    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Gagal membuat PDF. Cek koneksi internet.");
+                    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Gagal membuat PDF. Cek koneksi internet Anda.");
 
                     const doc = new window.jspdf.jsPDF('p', 'mm', 'a4');
-                    
                     processedImages.forEach((imgBase64, index) => {
                         if (index > 0) doc.addPage();
                         const imgProps = doc.getImageProperties(imgBase64);
@@ -211,52 +211,40 @@
                         doc.addImage(imgBase64, 'JPEG', 0, 0, pdfWidth, pdfHeight);
                     });
 
-                    let pdfUrlToSave = '#';
-
-                    if (GAS_WEB_APP_URL === "") {
-                        const pdfBlob = doc.output('blob');
-                        pdfUrlToSave = URL.createObjectURL(pdfBlob);
-                        await new Promise(r => setTimeout(r, 1500));
-                        
-                        const mockRecords = (extractedData.siswa || []).map(s => ({
-                            timestamp: new Date().toISOString(), sekolah: extractedData.sekolah, bulan: extractedData.bulan, tahun: extractedData.tahun, url: pdfUrlToSave, ...s
-                        }));
-                        setRecords(prev => [...mockRecords, ...prev]);
-                    } else {
-                        const pdfBase64Data = doc.output('datauristring').split(',')[1];
-                        const payload = { action: 'save', pdfBase64: pdfBase64Data, sekolah: extractedData.sekolah, bulan: extractedData.bulan, tahun: extractedData.tahun, siswa: extractedData.siswa || [] };
-                        const res = await fetch(GAS_WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }});
-                        const resData = await res.json();
-                        if (resData.status !== 'success') throw new Error(resData.message);
-                        fetchData();
-                    }
+                    const pdfBase64Data = doc.output('datauristring').split(',')[1];
+                    const payload = { action: 'save', pdfBase64: pdfBase64Data, sekolah: extractedData.sekolah, bulan: extractedData.bulan, tahun: extractedData.tahun, siswa: extractedData.siswa || [] };
                     
+                    const res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }});
+                    const resData = await res.json();
+                    
+                    if (resData.status !== 'success') throw new Error(resData.message);
+                    
+                    fetchData(); // Refresh Data
                     setUploadState('success');
-                    showToast('Semua data berhasil disimpan!', 'success');
+                    showToast('Semua data berhasil masuk ke Spreadsheet dan PDF ke Drive!', 'success');
                 } catch (err) {
-                    showToast('Gagal menyimpan: ' + err.message, 'error');
+                    showToast('Gagal menyimpan ke Database: ' + err.message, 'error');
                     setUploadState('form');
                 }
             };
 
             const fetchData = async () => {
-                if (GAS_WEB_APP_URL === "https://script.google.com/macros/s/AKfycbzstqUf4-goekIr0Gnw1CxWKWYN6AqPkG2pLdSGEA77b0cih8xproiBIKjBiTdd95kt/exec") return;
+                if (!backendUrl) return;
                 setLoadingData(true);
                 try {
-                    const res = await fetch(`${GAS_WEB_APP_URL}?action=getRecords`);
+                    const res = await fetch(`${backendUrl}?action=getRecords`);
                     const result = await res.json();
                     if (result.status === 'success') setRecords(result.data || []);
-                } catch (error) { showToast("Gagal memuat database dari server", 'error'); } 
+                } catch (error) { showToast("Gagal memuat database dari Google Sheets", 'error'); } 
                 finally { setLoadingData(false); }
             };
 
             const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedImages([]); };
 
             // ==========================================
-            // AGREGASI & FILTER DATA (Aman dari Undefined)
+            // AGREGASI & FILTER DATA
             // ==========================================
             const currentRecords = Array.isArray(records) ? records : [];
-            
             const optionsPendamping = [...new Set(currentRecords.map(r => r.pendamping))].filter(Boolean);
             const optionsBentuk = [...new Set(currentRecords.map(r => r.bentuk))].filter(Boolean);
             const optionsTingkat = [...new Set(currentRecords.map(r => r.tingkat))].filter(Boolean);
@@ -269,11 +257,7 @@
                     && (filterTingkat ? item.tingkat === filterTingkat : true);
             });
 
-            const aggregatePendamping = filteredKomponen.reduce((acc, curr) => { 
-                const p = curr.pendamping || 'Tanpa Nama';
-                acc[p] = (acc[p] || 0) + 1; return acc; 
-            }, {});
-            
+            const aggregatePendamping = filteredKomponen.reduce((acc, curr) => { const p = curr.pendamping || 'Tanpa Nama'; acc[p] = (acc[p] || 0) + 1; return acc; }, {});
             const aggregateBentukTingkat = filteredKomponen.reduce((acc, curr) => {
                 const bentuk = curr.bentuk || 'Lainnya'; const tingkat = curr.tingkat || 'Lainnya';
                 if (!acc[bentuk]) acc[bentuk] = {}; acc[bentuk][tingkat] = (acc[bentuk][tingkat] || 0) + 1;
@@ -298,19 +282,15 @@
             const exportToExcel = () => {
                 if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
                 if (!window.XLSX) return showToast("Library Excel gagal dimuat.", 'error');
-
                 const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Nama Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
-                
                 const wb = XLSX.utils.book_new();
-                const ws = XLSX.utils.json_to_sheet(wsData);
-                XLSX.utils.book_append_sheet(wb, ws, "Komponen");
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Komponen");
                 XLSX.writeFile(wb, `Data_Komponen_Export.xlsx`);
             };
 
             const exportToPDF = () => {
                 if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk dicetak", 'error');
                 if (!window.jspdf || !window.jspdf.jsPDF) return showToast("Library PDF gagal dimuat.", 'error');
-
                 const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
                 doc.setFont('helvetica', 'bold'); doc.setFontSize(14); doc.text("Laporan Data Komponen Sekolah", 14, 15);
                 doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.text(`Total: ${filteredKomponen.length} Siswa | Petugas: ${filterPendamping || 'Semua'}`, 14, 22);
@@ -319,20 +299,33 @@
             };
 
             // ==========================================
-            // DEFINISI MENU (INLINE)
+            // RENDER UI
             // ==========================================
-            const navItems = [
-                { id: 'upload', label: 'Scan Form', icon: Icons.Upload },
-                { id: 'dashboard_komponen', label: 'Statistik', icon: Icons.Chart },
-                { id: 'data_komponen', label: 'Database', icon: Icons.Database },
-                { id: 'dashboard_arsip', label: 'Dashboard Arsip', icon: Icons.Archive },
-                { id: 'arsip_pdf', label: 'Arsip PDF', icon: Icons.PDF }
-            ];
-
             return (
                 <div className="min-h-screen flex flex-col font-sans">
                     {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
                     <canvas ref={canvasRef} className="hidden"></canvas>
+
+                    {/* MODAL PENGATURAN */}
+                    {showSettings && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-fade-in p-4">
+                            <div className="bg-white rounded-3xl p-8 w-full max-w-xl shadow-2xl animate-slide-up">
+                                <div className="flex items-center gap-4 mb-6 text-brand-600 border-b border-slate-100 pb-4">
+                                    <Icons.Settings className="w-8 h-8" />
+                                    <h2 className="text-2xl font-black text-slate-800">Pengaturan Sistem</h2>
+                                </div>
+                                <div className="mb-6">
+                                    <label className="block text-sm font-bold text-slate-700 mb-2">URL Google Apps Script (Web App)</label>
+                                    <input type="text" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/macros/s/..." className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-4 text-slate-800 font-medium focus:ring-4 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all" />
+                                    <p className="text-xs text-slate-500 mt-3 font-medium">Sistem VerifDigi memerlukan backend dari Google Apps Script agar bisa membaca AI, menyimpan ke Sheets, dan membackup PDF ke Google Drive.</p>
+                                </div>
+                                <div className="flex gap-4 justify-end">
+                                    <button onClick={() => setShowSettings(false)} className="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl transition-colors">Tutup</button>
+                                    <button onClick={saveSettings} className="px-8 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition-colors">Simpan Koneksi</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* TOP NAVIGATION */}
                     <header className="sticky top-0 z-40 glass-panel">
@@ -340,16 +333,18 @@
                             <div className="flex items-center gap-3 text-brand-600 font-black text-2xl tracking-tight">
                                 <div className="bg-brand-600 text-white p-2 rounded-xl shadow-lg shadow-brand-500/30"><Icons.Scan className="w-6 h-6"/></div><span>Verif<span className="text-slate-800">Digi Pro</span></span>
                             </div>
-                            <nav className="flex p-1.5 bg-slate-100/50 rounded-2xl overflow-x-auto hide-scroll border border-slate-200/50">
-                                {navItems.map(item => {
-                                    const IconComponent = item.icon;
-                                    return (
-                                        <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex items-center gap-2 px-5 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === item.id ? 'bg-white shadow-md text-brand-600 scale-105' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}>
-                                            <IconComponent className="w-5 h-5"/> {item.label}
+                            <div className="flex items-center gap-2">
+                                <nav className="flex p-1.5 bg-slate-100/50 rounded-2xl overflow-x-auto hide-scroll border border-slate-200/50">
+                                    {[ {id:'upload', label:'Scan Form', icon:Icons.Upload}, {id:'dashboard_komponen', label:'Statistik', icon:Icons.Chart}, {id:'data_komponen', label:'Database', icon:Icons.Database}, {id:'dashboard_arsip', label:'Dashboard Arsip', icon:Icons.Archive}, {id:'arsip_pdf', label:'Arsip PDF', icon:Icons.PDF} ].map(item => (
+                                        <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 whitespace-nowrap ${activeTab === item.id ? 'bg-white shadow-md text-brand-600 scale-105' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'}`}>
+                                            <item.icon className="w-4 h-4"/> {item.label}
                                         </button>
-                                    );
-                                })}
-                            </nav>
+                                    ))}
+                                </nav>
+                                <button onClick={() => setShowSettings(true)} className="p-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-2xl transition-colors ml-2" title="Pengaturan URL">
+                                    <Icons.Settings />
+                                </button>
+                            </div>
                         </div>
                     </header>
 
@@ -361,15 +356,15 @@
                                 {uploadState === 'idle' && (
                                     <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 text-center relative overflow-hidden group">
                                         <div className="mx-auto w-24 h-24 bg-brand-100 text-brand-600 rounded-3xl flex items-center justify-center mb-8 shadow-inner"><Icons.Pages className="w-10 h-10"/></div>
-                                        <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">Scan Lintas Halaman</h2>
-                                        <p className="text-slate-500 text-lg mb-10 max-w-md mx-auto leading-relaxed">Pilih 1 atau beberapa foto sekaligus. AI akan menggabungkan semua halaman menjadi satu data sekolah utuh.</p>
+                                        <h2 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">Scan Form Cerdas</h2>
+                                        <p className="text-slate-500 text-lg mb-10 max-w-md mx-auto leading-relaxed">Pilih 1 atau beberapa halaman foto. AI akan membaca seluruh baris tabel secara otomatis.</p>
                                         
                                         <input type="file" multiple accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
                                         <button onClick={() => fileInputRef.current.click()} className="bg-brand-600 hover:bg-brand-700 text-white font-black text-lg py-5 px-12 rounded-2xl shadow-xl transition-all hover:-translate-y-1 hover:scale-105 active:scale-95">
                                             Pilih Foto Dokumen
                                         </button>
                                         
-                                        {GAS_WEB_APP_URL === "" && <div className="mt-8 animate-pulse inline-block px-5 py-3 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-sm font-bold">⚠️ MODE UJI COBA AKTIF (Tanpa Database)</div>}
+                                        {!backendUrl && <div className="mt-8 block cursor-pointer" onClick={() => setShowSettings(true)}><div className="animate-pulse inline-block px-5 py-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-bold">⚠️ URL Backend Belum Disetel! (Klik untuk Mengatur)</div></div>}
                                     </div>
                                 )}
 
@@ -377,16 +372,15 @@
                                     <div className="bg-white p-20 rounded-[2.5rem] shadow-2xl border border-slate-100 text-center animate-slide-up">
                                         <div className="mb-8"><span className="loader w-20 h-20"></span></div>
                                         <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-                                            {uploadState === 'processing_image' ? `Memproses Halaman...` : uploadState === 'extracting' ? 'AI Membaca Lintas Halaman...' : 'Menyatukan ke PDF & Database...'}
+                                            {uploadState === 'processing_image' ? `Memproses Halaman...` : uploadState === 'extracting' ? 'AI Membaca Setiap Baris Tabel...' : 'Menyatukan ke PDF & Database Server...'}
                                         </h2>
-                                        <p className="text-slate-500 mt-4 font-medium">Mohon tunggu, memastikan tidak ada error pada sistem.</p>
                                     </div>
                                 )}
 
                                 {uploadState === 'form' && (
                                     <div className="bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden animate-slide-up">
                                         <div className="bg-slate-50 px-10 py-8 border-b flex justify-between items-center">
-                                            <div><h2 className="text-3xl font-black text-slate-800">Hasil Deteksi AI</h2><p className="text-slate-500 font-medium">Dari {processedImages.length} Halaman Foto</p></div>
+                                            <div><h2 className="text-3xl font-black text-slate-800">Verifikasi Data AI</h2></div>
                                             <div className="bg-brand-600 text-white px-5 py-2 rounded-xl font-black text-lg shadow-md">{(extractedData.siswa || []).length} Baris</div>
                                         </div>
                                         <form onSubmit={handleSave} className="p-10 space-y-8">
@@ -402,16 +396,14 @@
                                             </div>
                                             
                                             <div>
-                                                <div className="flex items-center justify-between mb-4 mt-4">
-                                                    <h3 className="text-sm font-black text-slate-800 uppercase">Tabel Gabungan & Pendamping</h3>
-                                                </div>
+                                                <h3 className="text-sm font-black text-slate-800 uppercase mb-4 mt-4">Tabel Gabungan & Pendamping</h3>
                                                 <div className="max-h-80 overflow-y-auto space-y-3 pr-2 custom-scrollbar bg-slate-50 p-4 rounded-3xl border border-slate-100 shadow-inner">
                                                     {(extractedData.siswa || []).map((s, i) => (
-                                                        <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                                                        <div key={i} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 flex flex-col md:flex-row justify-between md:items-center gap-4 hover:border-brand-400 transition-colors">
                                                             <div>
                                                                 <div className="font-black text-slate-800 text-lg flex items-center gap-2"><span className="bg-slate-800 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">{i+1}</span> {s.nama_siswa}</div>
                                                                 <div className="text-xs text-slate-500 font-bold mt-2 ml-8">NISN: <span className="text-slate-700">{s.nisn}</span> | NIK: <span className="text-slate-700">{s.nik_siswa}</span></div>
-                                                                <div className="text-xs text-brand-600 font-black mt-2 ml-8 bg-brand-50 border border-brand-100 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg"><Icons.User className="w-3 h-3" /> Pendamping: {s.pendamping || 'Kosong'}</div>
+                                                                <div className="text-xs text-brand-600 font-black mt-2 ml-8 bg-brand-50 border border-brand-100 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg"><Icons.User className="w-3 h-3" /> PENDAMPING: {s.pendamping || 'Kosong'}</div>
                                                             </div>
                                                             <div className="text-left md:text-right ml-8 md:ml-0">
                                                                 <span className="inline-block bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-black mb-2">{s.bentuk} - {s.tingkat}</span>
@@ -419,12 +411,12 @@
                                                             </div>
                                                         </div>
                                                     ))}
-                                                    {(extractedData.siswa || []).length === 0 && <div className="text-center py-10 text-slate-500 font-bold">Tidak ada baris tabel yang terdeteksi.</div>}
+                                                    {(extractedData.siswa || []).length === 0 && <div className="text-center py-10 text-slate-500 font-bold">Tidak ada baris tabel yang terbaca.</div>}
                                                 </div>
                                             </div>
                                             <div className="flex gap-4 pt-8 border-t border-slate-100">
                                                 <button type="button" onClick={resetForm} className="px-8 py-5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black rounded-2xl">Batal</button>
-                                                <button type="submit" className="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-black text-lg py-5 px-8 rounded-2xl shadow-xl hover:-translate-y-1">Simpan {processedImages.length} Halaman PDF & Data</button>
+                                                <button type="submit" className="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-black text-lg py-5 px-8 rounded-2xl shadow-xl hover:-translate-y-1">Simpan Data & Buat PDF</button>
                                             </div>
                                         </form>
                                     </div>
@@ -433,7 +425,7 @@
                                 {uploadState === 'success' && (
                                     <div className="bg-white p-16 rounded-[2.5rem] shadow-2xl border border-slate-100 text-center animate-slide-up">
                                         <div className="flex justify-center mb-8"><Icons.Check className="w-16 h-16 text-emerald-500" /></div>
-                                        <h2 className="text-4xl font-black text-slate-800 mb-4">Berhasil Menyimpan!</h2>
+                                        <h2 className="text-4xl font-black text-slate-800 mb-4">Berhasil!</h2>
                                         <div className="flex justify-center gap-4 mt-8">
                                             <button onClick={resetForm} className="bg-slate-100 text-slate-700 font-black py-4 px-10 rounded-2xl">Upload Lain</button>
                                             <button onClick={() => setActiveTab('data_komponen')} className="bg-brand-600 text-white font-black py-4 px-10 rounded-2xl shadow-xl">Lihat Database</button>
@@ -444,7 +436,7 @@
                         )}
 
                         {/* ========================================================= */}
-                        {/* FILTER BAR GLOBAL (Untuk Tab Data & Statistik)            */}
+                        {/* FILTER BAR GLOBAL */}
                         {/* ========================================================= */}
                         {(activeTab === 'dashboard_komponen' || activeTab === 'data_komponen') && (
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-100 mb-6 animate-fade-in">
@@ -470,8 +462,7 @@
                         {/* 2. STATISTIK KOMPONEN */}
                         {activeTab === 'dashboard_komponen' && (
                             <div className="animate-fade-in">
-                                <div className="mb-6"><h2 className="text-3xl font-black text-slate-800 tracking-tight">Statistik Komponen</h2><p className="text-slate-500 text-lg">Visualisasi data berdasarkan filter interaktif.</p></div>
-                                
+                                <div className="mb-6"><h2 className="text-3xl font-black text-slate-800 tracking-tight">Statistik Komponen</h2></div>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                     <div className="lg:col-span-1 space-y-6">
                                         <div className="bg-gradient-to-br from-brand-600 to-indigo-700 rounded-[2rem] p-8 text-white shadow-xl shadow-brand-500/20 relative overflow-hidden group">
@@ -523,7 +514,7 @@
                         {activeTab === 'data_komponen' && (
                             <div className="animate-fade-in flex flex-col h-[85vh]">
                                 <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                                    <div><h2 className="text-3xl font-black text-slate-800 tracking-tight">Database Komponen</h2><p className="text-slate-500 text-lg">Tabel komprehensif seluruh data siswa hasil ekstraksi.</p></div>
+                                    <div><h2 className="text-3xl font-black text-slate-800 tracking-tight">Database Komponen</h2></div>
                                     <div className="flex gap-3">
                                         <button onClick={exportToExcel} className="flex items-center gap-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 text-sm font-bold py-3 px-6 rounded-2xl transition-colors shadow-sm"><Icons.Excel className="w-5 h-5"/> Ekspor Excel</button>
                                         <button onClick={exportToPDF} className="flex items-center gap-2 bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-800 text-sm font-bold py-3 px-6 rounded-2xl transition-colors shadow-sm"><Icons.PDF className="w-5 h-5"/> Cetak PDF</button>
@@ -559,7 +550,7 @@
                                                             </td>
                                                             <td className="px-8 py-5">
                                                                 <div className="font-black text-brand-600 mb-2">{item.pendamping}</div>
-                                                                {item.url && item.url !== '#' ? <a href={item.url} target="_blank" rel="noreferrer" className="bg-slate-100 text-slate-700 py-1.5 px-4 rounded-lg font-bold hover:bg-slate-200 text-xs transition-colors">Buka PDF</a> : <span className="text-xs text-slate-400 font-bold bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">Simulasi Lokal</span>}
+                                                                {item.url && item.url !== '#' ? <a href={item.url} target="_blank" rel="noreferrer" className="bg-slate-100 text-slate-700 py-1.5 px-4 rounded-lg font-bold hover:bg-slate-200 text-xs transition-colors">Buka PDF</a> : <span className="text-xs text-slate-400 font-bold bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">Belum Tersedia</span>}
                                                             </td>
                                                         </tr>
                                                     ))
@@ -581,16 +572,31 @@
 
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                     <div className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-[1rem] bg-rose-50 text-rose-500 flex items-center justify-center shrink-0"><Icons.PDF className="w-8 h-8"/></div>
-                                        <div><div className="text-sm text-slate-500 font-bold uppercase">Total Dokumen PDF</div><div className="text-4xl font-black text-slate-900">{arsipUnik.length}</div></div>
+                                        <div className="w-16 h-16 rounded-[1rem] bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
+                                            <Icons.PDF className="w-8 h-8"/>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm text-slate-500 font-bold uppercase">Total Dokumen PDF</div>
+                                            <div className="text-4xl font-black text-slate-900">{arsipUnik.length}</div>
+                                        </div>
                                     </div>
                                     <div className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-[1rem] bg-blue-50 text-blue-500 flex items-center justify-center shrink-0"><Icons.Archive className="w-8 h-8"/></div>
-                                        <div><div className="text-sm text-slate-500 font-bold uppercase">Sekolah Tervalidasi</div><div className="text-4xl font-black text-slate-900">{totalSekolahUnik}</div></div>
+                                        <div className="w-16 h-16 rounded-[1rem] bg-blue-50 text-blue-500 flex items-center justify-center shrink-0">
+                                            <Icons.Archive className="w-8 h-8"/>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm text-slate-500 font-bold uppercase">Sekolah Tervalidasi</div>
+                                            <div className="text-4xl font-black text-slate-900">{totalSekolahUnik}</div>
+                                        </div>
                                     </div>
                                     <div className="bg-white border border-slate-100 rounded-[2rem] p-8 shadow-sm flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-[1rem] bg-green-50 text-green-500 flex items-center justify-center shrink-0"><Icons.User className="w-8 h-8"/></div>
-                                        <div><div className="text-sm text-slate-500 font-bold uppercase">Petugas Terlibat</div><div className="text-4xl font-black text-slate-900">{totalPendampingAktif}</div></div>
+                                        <div className="w-16 h-16 rounded-[1rem] bg-green-50 text-green-500 flex items-center justify-center shrink-0">
+                                            <Icons.User className="w-8 h-8"/>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm text-slate-500 font-bold uppercase">Petugas Terlibat</div>
+                                            <div className="text-4xl font-black text-slate-900">{totalPendampingAktif}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -620,14 +626,14 @@
                                             </div>
                                             <div className="mt-8">
                                                 {item.url !== '#' ? (
-                                                    <a href={item.url} target="_blank" rel="noreferrer" className="block text-center w-full bg-brand-50 text-brand-700 hover:bg-brand-600 hover:text-white text-sm font-black py-4 rounded-2xl transition-all shadow-sm">Buka PDF Dokumen</a>
+                                                    <a href={item.url} target="_blank" rel="noreferrer" className="block text-center w-full bg-brand-50 text-brand-700 hover:bg-brand-600 hover:text-white text-sm font-black py-4 rounded-2xl transition-all shadow-sm">Buka PDF</a>
                                                 ) : (
-                                                    <button disabled className="block text-center w-full bg-slate-100 text-slate-400 text-sm font-black py-4 rounded-2xl cursor-not-allowed">Simulasi Lokal</button>
+                                                    <button disabled className="block text-center w-full bg-slate-100 text-slate-400 text-sm font-black py-4 rounded-2xl cursor-not-allowed">Belum Tersedia</button>
                                                 )}
                                             </div>
                                         </div>
                                     ))}
-                                    {filteredArsip.length === 0 && <div className="col-span-full text-center py-24 text-slate-400 font-black text-xl">Belum ada arsip tersimpan atau ditemukan.</div>}
+                                    {filteredArsip.length === 0 && <div className="col-span-full text-center py-24 text-slate-400 font-black text-xl">Belum ada arsip.</div>}
                                 </div>
                             </div>
                         )}
