@@ -35,6 +35,7 @@
         
         .form-control, .form-select { background-color: #0f172a; border: 1px solid #334155; color: #f8fafc; border-radius: 1rem; padding: 12px 16px; }
         .form-control:focus, .form-select:focus { background-color: #1e293b; border-color: #3b82f6; color: white; box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25); }
+        .form-select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); }
         
         .table { color: #cbd5e1; }
         .table-dark { background-color: transparent; }
@@ -64,10 +65,10 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // -----------------------------------------------------------------------------------------
-        // GANTI URL DI BAWAH INI DENGAN URL WEB APP BARU ANDA (YANG AKHIRANNYA /exec)
-        // -----------------------------------------------------------------------------------------
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzj9uVYcFb22B-KIVz3ef5h38gp3tXPsl_vyB6dL-agVnsWayBtU-fbqX3dCNmyHHV4/exec"; 
+        // =========================================================================
+        // URL WEB APP GAS - (Otomatis Tersimpan di Sistem)
+        // =========================================================================
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbynHomg215WKKWujDwAUb8eAQd79RLBKdMIvvBiuAEdJ68RJeBAxk9JdFOFY_Sh0_WB/exec"; 
 
         const { useState, useEffect, useRef } = React;
 
@@ -113,11 +114,22 @@
             const fileInputRef = useRef(null);
             const showToast = (message, type = 'success') => setToast({ message, type });
 
-            // FETCH DATA
+            // ==========================================
+            // KONEKSI API MURNI POST (ANTI-CACHE & CORS)
+            // ==========================================
             const fetchGAS = async (payload) => {
-                const res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+                const res = await fetch(backendUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
                 const text = await res.text();
-                try { return JSON.parse(text); } catch (e) { throw new Error("Server Error:\n" + text.substring(0, 100)); }
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error("RAW ERROR FROM GAS:", text);
+                    throw new Error("Server Error (URL Salah atau belum New Deployment):\n" + text.substring(0, 100));
+                }
             };
 
             const fetchData = async () => {
@@ -125,28 +137,34 @@
                 setLoadingData(true);
                 try {
                     const result = await fetchGAS({ action: 'getRecords' });
-                    if (result.status === 'success') { setRecords(Array.isArray(result.data) ? result.data : []); } 
-                    else throw new Error(result.message);
-                } catch (error) { showToast("Gagal memuat database: " + error.message, 'error'); } 
-                finally { setLoadingData(false); }
+                    if (result.status === 'success') {
+                        setRecords(Array.isArray(result.data) ? result.data : []);
+                    } else throw new Error(result.message);
+                } catch (error) { 
+                    showToast("Gagal memuat database: " + error.message, 'error'); 
+                } finally { setLoadingData(false); }
             };
 
-            useEffect(() => { if (activeTab !== 'upload' && records.length === 0) fetchData(); }, [activeTab]);
+            useEffect(() => {
+                if (activeTab !== 'upload' && records.length === 0) fetchData();
+            }, [activeTab]);
 
             const changeTab = (tab) => { setActiveTab(tab); setIsNavOpen(false); };
 
             const handleAdminToggle = () => {
-                if (isAdmin) { setIsAdmin(false); showToast('Admin Logout berhasil.', 'info'); } 
-                else {
+                if (isAdmin) {
+                    setIsAdmin(false); showToast('Admin Logout berhasil.', 'info');
+                } else {
                     const password = window.prompt("Masukkan Password Akses Admin:");
-                    if (password === "admin123") { setIsAdmin(true); showToast('Login Admin Berhasil!', 'success'); } 
-                    else if (password !== null) { showToast('Password Salah!', 'error'); }
+                    if (password === "admin123") {
+                        setIsAdmin(true); showToast('Login Admin Berhasil! Fitur Edit/Hapus aktif.', 'success');
+                    } else if (password !== null) { showToast('Password Salah!', 'error'); }
                 }
                 setIsNavOpen(false);
             };
 
             const handleDelete = async (timestamp) => {
-                if (!window.confirm("Peringatan: Yakin ingin menghapus data ini?")) return;
+                if (!window.confirm("Peringatan: Yakin ingin menghapus data ini secara permanen?")) return;
                 showToast("Menghapus data...", "info");
                 try {
                     const resData = await fetchGAS({ action: 'delete', timestamp: timestamp });
@@ -160,8 +178,10 @@
                 showToast("Menyimpan pembaruan...", "info");
                 try {
                     const resData = await fetchGAS({ action: 'update', ...editModal });
-                    if (resData.status === 'success') { showToast(resData.message, 'success'); setEditModal(null); fetchData(); } 
-                    else throw new Error(resData.message);
+                    if (resData.status === 'success') {
+                        showToast(resData.message, 'success');
+                        setEditModal(null); fetchData();
+                    } else throw new Error(resData.message);
                 } catch (e) { showToast("Gagal mengupdate: " + e.message, "error"); }
             };
 
@@ -207,7 +227,8 @@
                     const fileArray = [];
 
                     for (let file of files) {
-                        if (file.type === 'application/pdf') {
+                        const fileExt = file.name.toLowerCase();
+                        if (fileExt.endsWith('.pdf') || file.type === 'application/pdf') {
                             const base64 = await readFileAsBase64(file);
                             fileArray.push({ mimeType: 'application/pdf', data: base64.split(',')[1] });
                         } else {
@@ -219,26 +240,42 @@
                     if (fileArray.length === 0) throw new Error("Format file tidak didukung");
                     setProcessedFiles(fileArray);
                     extractTextFromFiles(fileArray);
-                } catch (error) { setUploadState('idle'); showToast('Gagal memproses file: ' + error.message, 'error'); }
+                } catch (error) {
+                    setUploadState('idle');
+                    showToast('Gagal memproses file: ' + error.message, 'error');
+                }
             };
 
             const extractTextFromFiles = async (fileArray) => {
                 setUploadState('extracting');
                 try {
-                    const data = await fetchGAS({ action: 'extract_multiple', files: fileArray.map(f => ({ mimeType: f.mimeType, data: f.data })) });
+                    const data = await fetchGAS({ 
+                        action: 'extract_multiple', 
+                        files: fileArray.map(f => ({ mimeType: f.mimeType, data: f.data })) 
+                    });
+
                     if (data.status === 'success') {
-                        const safeData = { sekolah: data.data?.sekolah || 'Tidak Terdeteksi', bulan: data.data?.bulan || '-', tahun: data.data?.tahun || '-', siswa: Array.isArray(data.data?.siswa) ? data.data.siswa : [] };
-                        setExtractedData(safeData); setUploadState('form');
+                        const safeData = {
+                            sekolah: data.data?.sekolah || 'Tidak Terdeteksi',
+                            bulan: data.data?.bulan || '-',
+                            tahun: data.data?.tahun || '-',
+                            siswa: Array.isArray(data.data?.siswa) ? data.data.siswa : [] 
+                        };
+                        setExtractedData(safeData);
+                        setUploadState('form');
                         showToast(`Berhasil membaca ${safeData.siswa.length} baris data dari file!`, 'success');
                     } else throw new Error(data.message || "Error dari AI");
                 } catch (err) {
-                    showToast('Gagal terhubung ke AI: ' + err.message, 'error'); setUploadState('idle');
+                    console.error(err);
+                    showToast('Gagal terhubung ke AI: ' + err.message, 'error');
+                    setUploadState('idle');
                 }
             };
 
             const handleSave = async (e) => {
                 e.preventDefault();
                 setUploadState('saving');
+
                 try {
                     let finalPdfBase64 = "";
                     const hasPdf = processedFiles.some(f => f.mimeType === 'application/pdf');
@@ -259,17 +296,29 @@
                         finalPdfBase64 = doc.output('datauristring').split(',')[1];
                     }
 
-                    const payload = { action: 'save', pdfBase64: finalPdfBase64, sekolah: extractedData.sekolah, bulan: extractedData.bulan, tahun: extractedData.tahun, siswa: extractedData.siswa || [] };
+                    const payload = { 
+                        action: 'save', 
+                        pdfBase64: finalPdfBase64, 
+                        sekolah: extractedData.sekolah, 
+                        bulan: extractedData.bulan, 
+                        tahun: extractedData.tahun, 
+                        siswa: extractedData.siswa || [] 
+                    };
+                    
                     const resData = await fetchGAS(payload);
                     if (resData.status !== 'success') throw new Error(resData.message);
                     
-                    fetchData(); setUploadState('success');
+                    fetchData(); 
+                    setUploadState('success');
                     if (resData.message) showToast(resData.message, 'success');
-                } catch (err) { showToast('Gagal menyimpan: ' + err.message, 'error'); setUploadState('form'); }
+                } catch (err) {
+                    showToast('Gagal menyimpan: ' + err.message, 'error');
+                    setUploadState('form');
+                }
             };
 
             const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedFiles([]); };
-            const saveSettings = () => { localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl); setBackendUrl(tempUrl); setShowSettings(false); showToast('URL API berhasil disimpan!', 'success'); };
+            const saveSettings = () => { localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl); setBackendUrl(tempUrl); setShowSettings(false); showToast('URL Backend API berhasil disimpan!', 'success'); };
 
             const currentRecords = Array.isArray(records) ? records : [];
             const optionsPendamping = [...new Set(currentRecords.map(r => r?.pendamping))].filter(Boolean);
@@ -381,6 +430,7 @@
                                 <div className="bg-primary text-white rounded p-2 d-flex align-items-center justify-content-center shadow" style={{width:'36px', height:'36px'}}><i className="fas fa-expand"></i></div>
                                 <span>Verif<span className="text-secondary">Digi Pro</span></span>
                             </a>
+                            
                             <button className="navbar-toggler border-0 text-white" type="button" onClick={() => setIsNavOpen(!isNavOpen)}><i className="fas fa-bars fs-3"></i></button>
 
                             <div className={`mobile-menu-collapse ${isNavOpen ? 'show' : ''} justify-content-end w-100 flex-lg-grow-1 d-lg-flex`}>
@@ -455,7 +505,7 @@
                                         <div className="card-custom p-5 text-center border-top border-success border-4 fade-in">
                                             <i className="fas fa-check-circle text-success mx-auto mb-4" style={{fontSize: '5rem'}}></i>
                                             <h2 className="text-white fw-bold mb-3">Berhasil!</h2>
-                                            <p className="text-secondary mb-5 fs-5">Data berhasil diverifikasi dan masuk ke Database.</p>
+                                            <p className="text-secondary mb-5 fs-5">Data berhasil diverifikasi dan masuk ke Database. Cek notifikasi pojok kanan untuk info duplikasi.</p>
                                             <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
                                                 <button onClick={resetForm} className="btn btn-light-custom btn-lg px-4">Upload Lain</button>
                                                 <button onClick={() => setActiveTab('data_komponen')} className="btn btn-brand btn-lg px-4">Lihat Database Live</button>
@@ -491,6 +541,7 @@
                                         <div className="card card-stats p-4 rounded-4 shadow h-100 justify-content-center">
                                             <div className="text-white-50 fw-bold text-uppercase mb-2">Total Siswa</div>
                                             <div className="display-3 fw-bold">{filteredKomponen.length}</div>
+                                            <i className="fas fa-users position-absolute opacity-25" style={{fontSize:'8rem', right:'-20px', bottom:'-20px'}}></i>
                                         </div>
                                         <div className="card card-custom p-4 rounded-4 shadow h-100">
                                             <h5 className="text-white fw-bold mb-4 border-bottom border-secondary border-opacity-50 pb-2">Top Surveyor</h5>
