@@ -17,7 +17,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* TEMA HITAM & KUNING (BLACK & YELLOW ENTERPRISE) */
         body { background-color: #000000; color: #e2e8f0; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #111111; }
@@ -54,7 +53,6 @@
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Notif melayang cantik di atas untuk Mobile */
         .toast-container-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 10px;}
         .toast-custom { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); border: 1px solid #ffc107; border-radius: 50px; padding: 12px 20px; color: white; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 10px 25px rgba(0,0,0,0.8); animation: slideDown 0.3s ease-out forwards;}
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -63,12 +61,9 @@
         .mobile-menu-collapse.show { display: block; animation: fadeIn 0.2s; }
         @media (min-width: 992px) { .mobile-menu-collapse { display: block !important; } }
         
-        /* Utility override untuk warna kuning dan kontras ketat */
         .text-warning { color: #ffc107 !important; }
         .bg-warning { background-color: #ffc107 !important; }
         .border-warning { border-color: #ffc107 !important; }
-        
-        /* Perbaikan kontras teks agar selalu jelas dibaca di HP */
         .text-secondary { color: #bbbbbb !important; }
         .text-light { color: #eeeeee !important; }
     </style>
@@ -77,10 +72,9 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // =========================================================================
-        // URL WEB APP GAS (BLUEPRINT TERKUNCI)
-        // =========================================================================
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzl5t7jwUrX5GikGPnVYmP5ECeNv7w3ILLJwsJx5S4N2ZtvanNMDaG_n-wlAml_vPUf/exec"; 
+        // BLUEPRINT URL
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxG_pzwnaZiTEBv8HPxZPEWMWmcr3BVzlh2YObPuVFj2WyXS0h0zofh8PVNsywOUzxh/exec"; 
+        const SPREADSHEET_DIRECT_URL = "https://docs.google.com/spreadsheets/d/1QerMqMttf-xYTuv6mEj0MJCujrNay9LJC2mFBFrC-vI/edit";
 
         const { useState, useEffect, useRef } = React;
 
@@ -104,6 +98,9 @@
             const [isNavOpen, setIsNavOpen] = useState(false);
             
             const [showSettings, setShowSettings] = useState(false);
+            const [showAdminModal, setShowAdminModal] = useState(false); // MODAL ADMIN BARU
+            const [adminPasswordInput, setAdminPasswordInput] = useState('');
+
             const [backendUrl, setBackendUrl] = useState(localStorage.getItem('VERIFDIGI_BACKEND_URL') || GAS_WEB_APP_URL);
             const [tempUrl, setTempUrl] = useState(backendUrl);
 
@@ -131,14 +128,7 @@
             const fetchGAS = async (payload) => {
                 const res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const text = await res.text();
-                try { 
-                    const data = JSON.parse(text); 
-                    // PEMBERITAHUAN PENDEK JIKA ADA ERROR DARI BACKEND
-                    if (data.status === 'error' && data.message && data.message.length > 100) {
-                        data.message = "Server Sibuk / API Limit. Coba lagi.";
-                    }
-                    return data;
-                } catch (e) { throw new Error("Koneksi Error / API Limit."); }
+                try { return JSON.parse(text); } catch (e) { throw new Error("Server Error:\n" + text.substring(0, 100)); }
             };
 
             const fetchData = async () => {
@@ -148,7 +138,7 @@
                     const result = await fetchGAS({ action: 'getRecords' });
                     if (result.status === 'success') { setRecords(Array.isArray(result.data) ? result.data : []); } 
                     else throw new Error(result.message);
-                } catch (error) { showToast("Gagal: " + error.message, 'error'); } 
+                } catch (error) { showToast("Gagal memuat database: " + error.message, 'error'); } 
                 finally { setLoadingData(false); }
             };
 
@@ -156,20 +146,23 @@
 
             const changeTab = (tab) => { setActiveTab(tab); setIsNavOpen(false); };
 
-            const handleAdminToggle = () => {
-                if (isAdmin) { 
-                    setIsAdmin(false); 
-                    showToast('Admin Logout berhasil.', 'info'); 
+            // LOGIKA MODAL ADMIN BARU (MODERN POPUP)
+            const handleAdminLoginSubmit = (e) => {
+                e.preventDefault();
+                if (adminPasswordInput === "admin123") {
+                    setIsAdmin(true);
+                    setAdminPasswordInput('');
+                    setShowAdminModal(false);
+                    showToast('Login Admin Berhasil! Akses penuh dibuka.', 'success');
                 } else {
-                    const password = prompt("Password:");
-                    if (password === "admin123") { 
-                        setIsAdmin(true); 
-                        showToast('Login Admin Berhasil!', 'success'); 
-                    } else if (password !== null) { 
-                        showToast('Password Salah!', 'error'); 
-                    }
+                    showToast('Password Salah!', 'error');
                 }
-                setIsNavOpen(false);
+            };
+
+            const handleAdminLogout = () => {
+                setIsAdmin(false);
+                setShowAdminModal(false);
+                showToast('Admin Logout berhasil.', 'info');
             };
 
             const handleDelete = async (timestamp) => {
@@ -185,7 +178,6 @@
             const handleResetAll = async () => {
                 if (!window.confirm("PERINGATAN KERAS! Anda yakin ingin MENGHAPUS SEMUA ISI DATABASE DAN SEMUA FILE PDF SECARA PERMANEN?")) return;
                 if (!window.confirm("Tindakan ini tidak bisa dikembalikan. Lanjutkan Reset?")) return;
-                
                 showToast("Sedang mereset seluruh sistem...", "info");
                 try {
                     const resData = await fetchGAS({ action: 'reset' });
@@ -212,7 +204,6 @@
                 });
             };
 
-            // LOGIKA AUTO-ROTATE KE LANDSCAPE DIKUNCI MATI
             const processSingleImage = (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -223,20 +214,11 @@
                                 const canvas = document.createElement('canvas');
                                 const ctx = canvas.getContext('2d');
                                 const maxWidth = 1200; 
-                                
                                 let isPortrait = img.height > img.width;
-                                
                                 let calcWidth = isPortrait ? img.height : img.width;
                                 let calcHeight = isPortrait ? img.width : img.height;
-
-                                if (calcWidth > maxWidth) { 
-                                    calcHeight = Math.round((calcHeight * maxWidth) / calcWidth); 
-                                    calcWidth = maxWidth; 
-                                }
-
-                                canvas.width = calcWidth; 
-                                canvas.height = calcHeight;
-                                
+                                if (calcWidth > maxWidth) { calcHeight = Math.round((calcHeight * maxWidth) / calcWidth); calcWidth = maxWidth; }
+                                canvas.width = calcWidth; canvas.height = calcHeight;
                                 if (isPortrait) {
                                     ctx.translate(calcWidth / 2, calcHeight / 2);
                                     ctx.rotate(-Math.PI / 2);
@@ -244,7 +226,6 @@
                                 } else {
                                     ctx.drawImage(img, 0, 0, calcWidth, calcHeight);
                                 }
-                                
                                 resolve(canvas.toDataURL('image/jpeg', 0.5)); 
                             } catch (e) { reject(e); }
                         };
@@ -262,7 +243,6 @@
                     
                     setUploadState('processing_image');
                     const fileArray = [...stagedFiles]; 
-
                     for (let file of files) {
                         const fileExt = file.name.toLowerCase();
                         if (fileExt.endsWith('.pdf') || file.type === 'application/pdf') {
@@ -273,7 +253,6 @@
                             fileArray.push({ mimeType: 'image/jpeg', data: base64.split(',')[1] });
                         }
                     }
-
                     if (fileArray.length === 0) throw new Error("Format file tidak didukung");
                     setStagedFiles(fileArray);
                     setUploadState('staged'); 
@@ -303,11 +282,8 @@
                         showToast(`Berhasil mengekstrak ${siswaArray.length} baris data utuh!`, 'success');
                     } else throw new Error(data.message || "Error dari AI");
                 } catch (err) { 
-                    // PEMBERITAHUAN PENDEK SAAT LIMIT
                     let errorMsg = err.message;
-                    if (errorMsg.length > 50 || errorMsg.includes('API') || errorMsg.includes('Limit')) {
-                        errorMsg = "API Limit / Key Salah. Coba lagi atau ganti kunci.";
-                    }
+                    if (errorMsg.length > 50 || errorMsg.includes('API') || errorMsg.includes('Limit')) errorMsg = "API Limit / Key Salah. Coba lagi.";
                     showToast('Gagal: ' + errorMsg, 'error'); 
                     setUploadState('idle'); 
                 }
@@ -327,7 +303,7 @@
                         finalPdfBase64 = pdfFile.data;
                     } else {
                         if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Library PDF gagal dimuat.");
-                        const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: [210, 330] }); // F4 Landscape Mutlak
+                        const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: [210, 330] }); 
                         processedFiles.forEach((f, index) => {
                             if (index > 0) doc.addPage();
                             const imgProps = doc.getImageProperties('data:image/jpeg;base64,' + f.data);
@@ -361,7 +337,7 @@
                 return matchSearch && (filterPendamping ? item.pendamping === filterPendamping : true) && (filterBentuk ? item.bentuk === filterBentuk : true) && (filterTingkat ? item.tingkat === filterTingkat : true);
             });
 
-            // LOGIKA FILTER KOMPONEN UNIK MUTLAK DIKUNCI MATI
+            // KUNCI: FILTER KOMPONEN UNIK MUTLAK
             const uniqueMap = new Map();
             const seenNisn = new Set();
             const seenNama = new Set();
@@ -369,7 +345,6 @@
             currentRecords.forEach(r => {
                 const nisnClean = String(r.nisn || '').replace(/[^0-9]/g, '');
                 const namaClean = String(r.nama_siswa || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-                
                 const isValidNisn = nisnClean.length > 3; 
                 const isValidNama = namaClean.length > 2;
 
@@ -416,7 +391,7 @@
                     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Database");
                     XLSX.writeFile(wb, `Live_Database_${new Date().getTime()}.xlsx`);
                     showToast("Berhasil mendownload Excel!", "success");
-                } catch (e) { showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
             };
 
             const exportToPDFDatabase = () => {
@@ -429,7 +404,7 @@
                     doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [255, 193, 7], textColor: [0, 0, 0] }});
                     doc.save(`Laporan_Database_${new Date().getTime()}.pdf`);
                     showToast("Berhasil mendownload PDF!", "success");
-                } catch (e) { showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
             };
 
             const exportToExcelUnik = () => {
@@ -439,7 +414,7 @@
                     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data Unik");
                     XLSX.writeFile(wb, `Data_Komponen_Unik_${new Date().getTime()}.xlsx`);
                     showToast("Berhasil mendownload Excel Data Komponen!", "success");
-                } catch (e) { showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
             };
 
             const exportToPDFUnik = () => {
@@ -452,7 +427,7 @@
                     doc.autoTable({ head: [['No', 'Nama Siswa', 'NISN', 'Nama Pengurus', 'Sekolah', 'Bentuk', 'Kelas', 'Pendamping']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [255, 193, 7], textColor: [0, 0, 0] }});
                     doc.save(`Laporan_Unik_${new Date().getTime()}.pdf`);
                     showToast("Berhasil mendownload PDF Data Komponen!", "success");
-                } catch (e) { showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
             };
 
             return (
@@ -461,6 +436,45 @@
                         {toast && <ToastMessage message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
                     </div>
 
+                    {/* MODAL ADMIN MODERN */}
+                    {showAdminModal && (
+                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.8)'}} tabIndex="-1">
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content card-custom border-warning">
+                                    <div className="modal-header border-secondary border-opacity-50 pb-3">
+                                        <h5 className="modal-title fw-bold text-white"><i className="fas fa-user-shield text-warning me-2"></i> {isAdmin ? 'Admin Dashboard' : 'Login Admin'}</h5>
+                                    </div>
+                                    <div className="modal-body py-4">
+                                        {!isAdmin ? (
+                                            <form onSubmit={handleAdminLoginSubmit}>
+                                                <label className="form-label text-secondary fw-bold small">Masukkan Password</label>
+                                                <input type="password" autoFocus className="form-control bg-dark text-white border-secondary border-opacity-50 mb-3" value={adminPasswordInput} onChange={e => setAdminPasswordInput(e.target.value)} placeholder="••••••••" required />
+                                                <div className="d-flex gap-2">
+                                                    <button type="button" className="btn btn-light-custom w-50" onClick={() => setShowAdminModal(false)}>Batal</button>
+                                                    <button type="submit" className="btn btn-warning fw-bold w-50">Login</button>
+                                                </div>
+                                            </form>
+                                        ) : (
+                                            <div className="text-center">
+                                                <div className="text-success fw-bold mb-4"><i className="fas fa-check-circle me-1"></i> Anda telah login sebagai Admin</div>
+                                                <div className="d-flex flex-column gap-3">
+                                                    <a href={SPREADSHEET_DIRECT_URL} target="_blank" className="btn btn-outline-success fw-bold p-3"><i className="fas fa-external-link-alt me-2"></i> Buka Link Database (Spreadsheet)</a>
+                                                    <button onClick={handleAdminLogout} className="btn btn-outline-danger fw-bold p-3"><i className="fas fa-sign-out-alt me-2"></i> Keluar (Logout)</button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    {isAdmin && (
+                                        <div className="modal-footer border-0 pt-0">
+                                            <button type="button" className="btn btn-light-custom w-100" onClick={() => setShowAdminModal(false)}>Tutup Panel</button>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* MODAL EDIT */}
                     {editModal && (
                         <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.8)'}} tabIndex="-1">
                             <div className="modal-dialog modal-lg modal-dialog-centered">
@@ -488,26 +502,6 @@
                         </div>
                     )}
 
-                    {showSettings && (
-                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.8)'}} tabIndex="-1">
-                            <div className="modal-dialog modal-dialog-centered">
-                                <div className="modal-content card-custom">
-                                    <div className="modal-header border-secondary border-opacity-50 pb-3">
-                                        <h5 className="modal-title fw-bold text-white"><i className="fas fa-server text-warning me-2"></i> Setup API</h5>
-                                    </div>
-                                    <div className="modal-body py-4">
-                                        <label className="form-label text-secondary fw-bold small">URL Google Apps Script</label>
-                                        <input type="text" className="form-control bg-dark text-white border-secondary border-opacity-50" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/..." />
-                                    </div>
-                                    <div className="modal-footer border-0 pt-0">
-                                        <button type="button" className="btn btn-light-custom" onClick={() => setShowSettings(false)}>Batal</button>
-                                        <button type="button" className="btn btn-brand" onClick={saveSettings}>Simpan URL</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
                     <nav className="navbar navbar-expand-lg glass-header sticky-top py-2 py-md-3">
                         <div className="container-fluid px-3 px-lg-5">
                             <a className="navbar-brand fw-black text-white fs-5 fs-md-4 d-flex align-items-center gap-2" href="#" onClick={(e)=>{e.preventDefault(); changeTab('upload');}}>
@@ -527,7 +521,7 @@
                                     <li className="nav-item"><button onClick={() => changeTab('dashboard_arsip')} className={`nav-link w-100 text-start ${activeTab === 'dashboard_arsip' ? 'active' : ''}`}><i className="fas fa-folder-open me-2"></i> Arsip</button></li>
                                     <li className="nav-item"><button onClick={() => changeTab('arsip_pdf')} className={`nav-link w-100 text-start ${activeTab === 'arsip_pdf' ? 'active' : ''}`}><i className="fas fa-file-pdf me-2"></i> PDF</button></li>
                                     <li className="nav-item ms-lg-3 border-start border-secondary border-opacity-50 ps-lg-3 mt-2 mt-lg-0">
-                                        <button onClick={handleAdminToggle} className={`btn btn-sm w-100 fw-bold ${isAdmin ? 'btn-warning' : 'btn-outline-warning rounded-pill'}`}><i className={`fas ${isAdmin ? 'fa-unlock' : 'fa-lock'} me-2`}></i> {isAdmin ? 'Admin' : 'Admin'}</button>
+                                        <button onClick={() => { setIsNavOpen(false); setShowAdminModal(true); }} className={`btn btn-sm w-100 fw-bold ${isAdmin ? 'btn-warning' : 'btn-outline-warning rounded-pill'}`}><i className={`fas ${isAdmin ? 'fa-unlock' : 'fa-lock'} me-2`}></i> {isAdmin ? 'Admin Menu' : 'Admin'}</button>
                                     </li>
                                 </ul>
                             </div>
@@ -544,7 +538,6 @@
                                             <div className="mx-auto bg-dark text-warning rounded-circle d-flex align-items-center justify-content-center mb-4 border border-warning border-opacity-50" style={{width:'70px', height:'70px'}}><i className="fas fa-file-invoice fs-2"></i></div>
                                             <h2 className="fw-bold text-white mb-3">Multi-File AI Scanner</h2>
                                             
-                                            {/* PEMBERITAHUAN ATURAN FOTO MAKSIMAL (PERBAIKAN KONTRAS TEKS & BACKGROUND) */}
                                             <div className="alert small fw-bold text-start mb-4 rounded-3 p-3" style={{backgroundColor: '#1a1400', border: '1px solid #ffc107'}}>
                                                 <i className="fas fa-exclamation-triangle text-warning me-2 mb-2 fs-6"></i> <span className="text-uppercase text-warning">Aturan Foto Maksimal:</span><br/>
                                                 <ul className="mb-0 mt-1 ps-3 text-light" style={{lineHeight: '1.6'}}>
@@ -559,7 +552,7 @@
                                         </div>
                                     )}
 
-                                    {/* MENU STAGING: TAMBAH HALAMAN (INFO JELAS UNTUK 1 HALAMAN) */}
+                                    {/* MENU STAGING: TAMBAH HALAMAN */}
                                     {uploadState === 'staged' && (
                                         <div className="card-custom p-4 p-md-5 text-center fade-in">
                                             <div className="mx-auto bg-dark text-warning rounded-circle d-flex align-items-center justify-content-center mb-4 border border-warning border-opacity-50" style={{width:'70px', height:'70px'}}><i className="fas fa-layer-group fs-2"></i></div>
@@ -572,13 +565,7 @@
                                             <input type="file" multiple accept="image/*,.pdf" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
                                             
                                             <div className="d-flex flex-column gap-3 mt-4">
-                                                {/* TOMBOL UTAMA DI ATAS */}
-                                                <button onClick={() => {
-                                                    setProcessedFiles(stagedFiles);
-                                                    extractTextFromFiles(stagedFiles);
-                                                }} className="btn btn-brand py-3 shadow w-100 fs-6"><i className="fas fa-magic me-2"></i> Mulai Ekstrak AI</button>
-                                                
-                                                {/* TOMBOL TAMBAH HALAMAN DI BAWAH */}
+                                                <button onClick={() => { setProcessedFiles(stagedFiles); extractTextFromFiles(stagedFiles); }} className="btn btn-brand py-3 shadow w-100 fs-6"><i className="fas fa-magic me-2"></i> Mulai Ekstrak AI</button>
                                                 <button onClick={() => fileInputRef.current.click()} className="btn btn-outline-warning py-3 fw-bold w-100"><i className="fas fa-plus me-2"></i> Tambah Halaman Lain (Jika Ada)</button>
                                             </div>
                                             <div className="mt-4">
