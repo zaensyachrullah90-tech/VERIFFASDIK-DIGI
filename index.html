@@ -80,7 +80,7 @@
         // =========================================================================
         // URL WEB APP GAS (BLUEPRINT TERKUNCI)
         // =========================================================================
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwEpoHeafLplDRTMtgYzzEezALGxifiKC0GdreUyfbSlQcFion9CD9dpYKFpUiQeLfw/exec"; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzftFc9_IK-H1_D4l4lhG5gAak6xlI0MF8V1quPSOslG9JrUmZSRwAlWRt5E54CLk3W/exec"; 
 
         const { useState, useEffect, useRef } = React;
 
@@ -131,7 +131,14 @@
             const fetchGAS = async (payload) => {
                 const res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const text = await res.text();
-                try { return JSON.parse(text); } catch (e) { throw new Error("Server Error:\n" + text.substring(0, 100)); }
+                try { 
+                    const data = JSON.parse(text); 
+                    // PEMBERITAHUAN PENDEK JIKA ADA ERROR DARI BACKEND
+                    if (data.status === 'error' && data.message && data.message.length > 100) {
+                        data.message = "Server Sibuk / API Limit. Coba lagi.";
+                    }
+                    return data;
+                } catch (e) { throw new Error("Koneksi Error / API Limit."); }
             };
 
             const fetchData = async () => {
@@ -141,7 +148,7 @@
                     const result = await fetchGAS({ action: 'getRecords' });
                     if (result.status === 'success') { setRecords(Array.isArray(result.data) ? result.data : []); } 
                     else throw new Error(result.message);
-                } catch (error) { showToast("Gagal memuat database: " + error.message, 'error'); } 
+                } catch (error) { showToast("Gagal: " + error.message, 'error'); } 
                 finally { setLoadingData(false); }
             };
 
@@ -295,7 +302,15 @@
                         setExtractedData(safeData); setUploadState('form');
                         showToast(`Berhasil mengekstrak ${siswaArray.length} baris data utuh!`, 'success');
                     } else throw new Error(data.message || "Error dari AI");
-                } catch (err) { showToast('Gagal: ' + err.message, 'error'); setUploadState('idle'); }
+                } catch (err) { 
+                    // PEMBERITAHUAN PENDEK SAAT LIMIT
+                    let errorMsg = err.message;
+                    if (errorMsg.length > 50 || errorMsg.includes('API') || errorMsg.includes('Limit')) {
+                        errorMsg = "API Limit / Key Salah. Coba lagi atau ganti kunci.";
+                    }
+                    showToast('Gagal: ' + errorMsg, 'error'); 
+                    setUploadState('idle'); 
+                }
             };
 
             const handleSave = async (e) => {
@@ -397,7 +412,7 @@
             const exportToExcelDatabase = () => {
                 if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
                 try {
-                    const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nama_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
+                    const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
                     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Database");
                     XLSX.writeFile(wb, `Live_Database_${new Date().getTime()}.xlsx`);
                     showToast("Berhasil mendownload Excel!", "success");
@@ -493,7 +508,6 @@
                         </div>
                     )}
 
-                    {/* NAMA APLIKASI TELAH DIUBAH */}
                     <nav className="navbar navbar-expand-lg glass-header sticky-top py-2 py-md-3">
                         <div className="container-fluid px-3 px-lg-5">
                             <a className="navbar-brand fw-black text-white fs-5 fs-md-4 d-flex align-items-center gap-2" href="#" onClick={(e)=>{e.preventDefault(); changeTab('upload');}}>
@@ -537,7 +551,6 @@
                                                     <li>Posisi kamera <strong className="text-warning">WAJIB MENDATAR (LANDSCAPE)</strong>.</li>
                                                     <li>Jika terpaksa berdiri, sistem akan otomatis merotasinya.</li>
                                                     <li>Hasil akhir otomatis menjadi F4 Landscape.</li>
-                                                    <li>Anda bisa tambah foto jika lebih dari 1 halaman.</li>
                                                 </ul>
                                             </div>
 
@@ -546,21 +559,27 @@
                                         </div>
                                     )}
 
-                                    {/* MENU STAGING: TAMBAH HALAMAN */}
+                                    {/* MENU STAGING: TAMBAH HALAMAN (INFO JELAS UNTUK 1 HALAMAN) */}
                                     {uploadState === 'staged' && (
                                         <div className="card-custom p-4 p-md-5 text-center fade-in">
                                             <div className="mx-auto bg-dark text-warning rounded-circle d-flex align-items-center justify-content-center mb-4 border border-warning border-opacity-50" style={{width:'70px', height:'70px'}}><i className="fas fa-layer-group fs-2"></i></div>
                                             <h3 className="fw-bold text-white mb-2">Dokumen Siap</h3>
-                                            <p className="text-secondary mb-4 small fw-bold">{stagedFiles.length} Halaman / File ditambahkan. (File tidak tercampur)</p>
+                                            <p className="text-secondary mb-3 small fw-bold">
+                                                {stagedFiles.length} Halaman / File ditambahkan.<br/>
+                                                <span className="text-warning mt-2 d-inline-block">Info: Jika dokumen hanya 1 halaman, langsung klik "Mulai Ekstrak AI". Jika lebih, klik "Tambah Halaman Lain".</span>
+                                            </p>
                                             
                                             <input type="file" multiple accept="image/*,.pdf" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
                                             
-                                            <div className="d-flex flex-column gap-3">
-                                                <button onClick={() => fileInputRef.current.click()} className="btn btn-outline-warning py-3 fw-bold w-100"><i className="fas fa-plus me-2"></i> Tambah Halaman Lain</button>
+                                            <div className="d-flex flex-column gap-3 mt-4">
+                                                {/* TOMBOL UTAMA DI ATAS */}
                                                 <button onClick={() => {
                                                     setProcessedFiles(stagedFiles);
                                                     extractTextFromFiles(stagedFiles);
-                                                }} className="btn btn-brand py-3 shadow w-100"><i className="fas fa-magic me-2"></i> Mulai Ekstrak AI</button>
+                                                }} className="btn btn-brand py-3 shadow w-100 fs-6"><i className="fas fa-magic me-2"></i> Mulai Ekstrak AI</button>
+                                                
+                                                {/* TOMBOL TAMBAH HALAMAN DI BAWAH */}
+                                                <button onClick={() => fileInputRef.current.click()} className="btn btn-outline-warning py-3 fw-bold w-100"><i className="fas fa-plus me-2"></i> Tambah Halaman Lain (Jika Ada)</button>
                                             </div>
                                             <div className="mt-4">
                                                 <button onClick={resetForm} className="btn btn-link text-secondary text-decoration-none small"><i className="fas fa-times me-1"></i> Batalkan Semua</button>
