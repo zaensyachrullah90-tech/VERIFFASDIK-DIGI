@@ -30,15 +30,15 @@
         .card-custom { background-color: #0f0f0f; border: 1px solid #222222; border-radius: 1.2rem; box-shadow: 0 8px 20px rgba(255, 193, 7, 0.05); }
         .card-stats { background: linear-gradient(135deg, #1a1a1a, #0a0a0a); border: 1px solid #ffc107; color: #ffc107; }
         
-        .nav-pills .nav-link { color: #888888; border-radius: 0.8rem; padding: 8px 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; background: transparent; font-size: 0.9rem;}
+        .nav-pills .nav-link { color: #aaaaaa; border-radius: 0.8rem; padding: 8px 16px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; background: transparent; font-size: 0.9rem;}
         .nav-pills .nav-link:hover { background-color: #222222; color: #ffc107; }
         .nav-pills .nav-link.active { background-color: #ffc107; color: #000000; box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4); }
         
-        .form-control, .form-select { background-color: #111111; border: 1px solid #333333; color: #ffffff; border-radius: 0.8rem; padding: 10px 14px; font-size: 0.9rem;}
+        .form-control, .form-select { background-color: #111111; border: 1px solid #444444; color: #ffffff; border-radius: 0.8rem; padding: 10px 14px; font-size: 0.9rem;}
         .form-control:focus, .form-select:focus { background-color: #1a1a1a; border-color: #ffc107; color: white; box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25); }
         .form-select { background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffc107' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); }
         
-        .table { color: #cbd5e1; font-size: 0.85rem;}
+        .table { color: #e2e8f0; font-size: 0.85rem;}
         .table-dark { background-color: transparent; }
         .table-dark th { background-color: #000000; border-bottom: 2px solid #ffc107; color: #ffc107; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;}
         .table-dark td { background-color: #0f0f0f; border-bottom: 1px solid #222222; vertical-align: middle; }
@@ -49,7 +49,7 @@
         .btn-light-custom { background-color: #222222; color: #ffffff; border: none; border-radius: 0.8rem; padding: 10px 20px; font-weight: 700; font-size: 0.9rem;}
         .btn-light-custom:hover { background-color: #333333; color: #ffc107; }
 
-        .badge-brand { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; padding: 4px 10px; border-radius: 6px; border: 1px solid #ffc107; font-size: 0.7rem; }
+        .badge-brand { background-color: rgba(255, 193, 7, 0.15); color: #ffc107; padding: 4px 10px; border-radius: 6px; border: 1px solid #ffc107; font-size: 0.7rem; }
 
         .fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -67,6 +67,9 @@
         .text-warning { color: #ffc107 !important; }
         .bg-warning { background-color: #ffc107 !important; }
         .border-warning { border-color: #ffc107 !important; }
+        
+        /* Perbaikan kontras teks */
+        .text-secondary { color: #adb5bd !important; }
     </style>
 </head>
 <body>
@@ -82,7 +85,6 @@
 
         const ToastMessage = ({ message, type, onClose }) => {
             useEffect(() => { const timer = setTimeout(onClose, 5000); return () => clearTimeout(timer); }, [onClose]);
-            // Sesuaikan warna icon dengan tema Hitam Kuning
             const iconColor = type === 'error' ? 'text-danger' : type === 'success' ? 'text-success' : 'text-warning';
             const icon = type === 'error' ? 'fa-triangle-exclamation' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
             return (
@@ -327,35 +329,28 @@
             // ==========================================
             // PERBAIKAN MUTLAK: AGREGASI DATA KOMPONEN (1 NISN ATAU 1 NAMA = 1 DATA BARIS)
             // ==========================================
-            const uniqueStudents = [];
+            const uniqueMap = new Map();
             const seenNisn = new Set();
             const seenNama = new Set();
-
+            
             currentRecords.forEach(r => {
-                // Bersihkan string agar komparasi akurat
                 const nisnClean = String(r.nisn || '').replace(/[^0-9]/g, '');
-                const namaClean = String(r.nama_siswa || '').replace(/[^a-zA-Z0-9 ]/g, '').toLowerCase().trim();
+                const namaClean = String(r.nama_siswa || '').replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
                 
-                const isValidNisn = nisnClean.length >= 3;
-                const isValidNama = namaClean.length >= 3;
-                
-                if (!isValidNisn && !isValidNama) return; // Skip baris yang sama sekali kosong
-                
+                const isValidNisn = nisnClean.length > 3; 
+                const isValidNama = namaClean.length > 2;
+
                 let isDuplicate = false;
-                
-                // Jika NISN valid dan sudah pernah dilihat = DUPLIKAT
                 if (isValidNisn && seenNisn.has(nisnClean)) isDuplicate = true;
-                
-                // Jika NAMA valid dan sudah pernah dilihat = DUPLIKAT
-                if (isValidNama && seenNama.has(namaClean)) isDuplicate = true;
-                
-                // Jika bukan duplikat, masukkan ke array dan catat NISN/Namanya
-                if (!isDuplicate) {
+                if (!isValidNisn && isValidNama && seenNama.has(namaClean)) isDuplicate = true;
+
+                if (!isDuplicate && (isValidNisn || isValidNama)) {
+                    uniqueMap.set(nisnClean + "_" + namaClean, r);
                     if (isValidNisn) seenNisn.add(nisnClean);
                     if (isValidNama) seenNama.add(namaClean);
-                    uniqueStudents.push(r);
                 }
             });
+            const uniqueStudents = Array.from(uniqueMap.values());
             
             const filteredUnique = uniqueStudents.filter(item => {
                 if (!item) return false;
@@ -382,7 +377,7 @@
             const totalPendampingAktif = new Set(arsipUnik.map(a => a.pendamping)).size;
 
             // ==========================================
-            // EXPORT EXCEL & PDF - F4 LANDSCAPE TEMA KUNING HITAM
+            // EXPORT EXCEL & PDF - DIPERBAIKI MUTLAK
             // ==========================================
             const exportToExcelDatabase = () => {
                 if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
@@ -391,7 +386,7 @@
                     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Database");
                     XLSX.writeFile(wb, `Live_Database_${new Date().getTime()}.xlsx`);
                     showToast("Berhasil mendownload Excel!", "success");
-                } catch (e) { showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
             };
 
             const exportToPDFDatabase = () => {
@@ -401,11 +396,10 @@
                     doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Live Database", 14, 15);
                     doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total Baris Data: ${filteredKomponen.length} (Bisa ada duplikat bulan)`, 14, 22);
                     const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
-                    // Header warna kuning, text hitam
                     doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [255, 193, 7], textColor: [0, 0, 0] }});
                     doc.save(`Laporan_Database_${new Date().getTime()}.pdf`);
                     showToast("Berhasil mendownload PDF!", "success");
-                } catch (e) { showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
             };
 
             const exportToExcelUnik = () => {
@@ -415,7 +409,7 @@
                     const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data Unik");
                     XLSX.writeFile(wb, `Data_Komponen_Unik_${new Date().getTime()}.xlsx`);
                     showToast("Berhasil mendownload Excel Data Komponen!", "success");
-                } catch (e) { showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mengekspor Excel: Pastikan koneksi stabil", "error"); }
             };
 
             const exportToPDFUnik = () => {
@@ -425,11 +419,10 @@
                     doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Komponen (Siswa Unik)", 14, 15);
                     doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total Siswa Tervalidasi: ${filteredUnique.length} (1 NISN / Nama = 1 Data)`, 14, 22);
                     const tableData = filteredUnique.map((r, i) => [ i + 1, r.nama_siswa, r.nisn, r.nama_pengurus, r.sekolah, r.bentuk, r.tingkat, r.pendamping ]);
-                    // Header warna kuning, text hitam
                     doc.autoTable({ head: [['No', 'Nama Siswa', 'NISN', 'Nama Pengurus', 'Sekolah', 'Bentuk', 'Kelas', 'Pendamping']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [255, 193, 7], textColor: [0, 0, 0] }});
                     doc.save(`Laporan_Unik_${new Date().getTime()}.pdf`);
                     showToast("Berhasil mendownload PDF Data Komponen!", "success");
-                } catch (e) { showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
+                } catch (e) { console.error(e); showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
             };
 
             return (
@@ -548,10 +541,10 @@
                                                     {(extractedData.siswa || []).map((s, i) => (
                                                         <div key={i} className="bg-dark bg-opacity-50 p-3 rounded-4 border border-secondary border-opacity-25 mb-2">
                                                             <div className="row align-items-center g-2">
-                                                                <div className="col-12 col-lg-7"><div className="d-flex align-items-start gap-2"><span className="badge bg-warning text-dark rounded-pill py-1 px-2 mt-1">{i+1}</span><div><div className="text-white fw-bold small">{s.nama_siswa}</div><div className="text-secondary" style={{fontSize:'0.7rem'}}>NISN: <span className="text-white">{s.nisn}</span> | NIK: <span className="text-white">{s.nik_siswa}</span></div><div className="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-50 px-2 py-1 mt-1"><i className="fas fa-user me-1"></i> {s.pendamping}</div></div></div></div>
+                                                                <div className="col-12 col-lg-7"><div className="d-flex align-items-start gap-2"><span className="badge bg-warning text-dark rounded-pill py-1 px-2 mt-1">{i+1}</span><div><div className="text-white fw-bold small">{s.nama_siswa}</div><div className="text-secondary" style={{fontSize:'0.7rem'}}>NISN: <span className="text-white">{s.nisn}</span> | NIK: <span className="text-white">{s.nik_siswa}</span></div><div className="badge bg-warning text-dark px-2 py-1 mt-2 fw-bold" style={{fontSize: '0.75rem'}}><i className="fas fa-user-tie me-1"></i> PENDAMPING: {s.pendamping || '-'}</div></div></div></div>
                                                                 <div className="col-12 col-lg-5 text-start text-lg-end">
                                                                     <div className="badge bg-secondary text-white px-2 py-1 rounded-pill text-wrap lh-base" style={{fontSize:'0.65rem'}}>{s.bentuk} &bull; {s.tingkat} &bull; <span className="text-warning">{s.bulan} {s.tahun}</span></div>
-                                                                    <div className="text-secondary bg-dark px-2 py-1 rounded border border-secondary border-opacity-25 d-inline-block mt-1 mt-lg-0 ms-2 ms-lg-0" style={{fontSize:'0.65rem'}}>Wali: <strong className="text-white">{s.nama_pengurus}</strong></div>
+                                                                    <br/><div className="text-secondary bg-dark px-2 py-1 rounded border border-secondary border-opacity-25 d-inline-block mt-2 mt-lg-0" style={{fontSize:'0.65rem'}}>Wali: <strong className="text-white">{s.nama_pengurus}</strong></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -692,7 +685,7 @@
                                                         <td className="p-2 p-md-3"><div className="text-white fw-bold" style={{fontSize: '0.75rem'}}>{r.sekolah}</div></td>
                                                         <td className="p-2 p-md-3">
                                                             <div className="text-secondary mb-1" style={{fontSize: '0.65rem'}}><i className="fas fa-user-tie me-1"></i> Wali: {r.nama_pengurus}</div>
-                                                            <div className="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-50 px-2 py-1" style={{fontSize: '0.65rem'}}><i className="fas fa-user me-1"></i> {r.pendamping}</div>
+                                                            <div className="badge bg-warning text-dark px-2 py-1 fw-bold" style={{fontSize: '0.7rem'}}><i className="fas fa-user-tie me-1"></i> {r.pendamping || '-'}</div>
                                                         </td>
                                                     </tr>
                                                  ))
@@ -750,7 +743,7 @@
                                                             <div className="text-secondary" style={{fontSize:'0.65rem'}}><i className="fas fa-user-tie me-1"></i> {r.nama_pengurus}</div>
                                                         </td>
                                                         <td className="p-2 p-md-3">
-                                                            <div className="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-50 px-2 py-1 d-inline-block mb-1 text-truncate" style={{maxWidth:'100px', fontSize:'0.6rem'}}><i className="fas fa-user me-1"></i> {r.pendamping}</div><br/>
+                                                            <div className="badge bg-warning text-dark px-2 py-1 d-inline-block mb-1 text-truncate fw-bold" style={{maxWidth:'150px', fontSize:'0.7rem'}}><i className="fas fa-user-tie me-1"></i> {r.pendamping || '-'}</div><br/>
                                                             {r.url!=='#' ? <a href={r.url} target="_blank" className="btn btn-sm btn-outline-danger fw-bold py-0 px-2" style={{fontSize:'0.65rem'}}><i className="fas fa-file-pdf"></i> Buka</a> : <span className="badge bg-dark text-secondary" style={{fontSize:'0.65rem'}}>No File</span>}
                                                         </td>
                                                         {isAdmin && (
@@ -786,7 +779,7 @@
                                     <div className="col-12 col-md-4">
                                         <div className="card-custom p-4 p-lg-5 rounded-4 shadow text-center border-top border-danger border-4">
                                             <i className="fas fa-file-pdf text-danger fs-2 mb-2"></i>
-                                            <div className="text-secondary fw-bold text-uppercase mb-1 small">Total PDF</div>
+                                            <div className="text-secondary fw-bold text-uppercase mb-1 small">Total Dokumen PDF</div>
                                             <div className="fs-1 fw-bold text-white">{arsipUnik.length}</div>
                                         </div>
                                     </div>
@@ -811,7 +804,7 @@
                         {/* 5. ARSIP PDF DIGITAL */}
                         {activeTab === 'arsip_pdf' && (
                             <div className="fade-in">
-                                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom border-secondary border-opacity-50 pb-3">
+                                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-5 border-bottom border-secondary border-opacity-50 pb-4">
                                     <div className="d-flex align-items-center gap-2">
                                         <div className="bg-secondary text-white p-2 rounded-3"><i className="fas fa-file-pdf fs-5"></i></div>
                                         <h5 className="text-white fw-bold m-0">Arsip Scan Dokumen</h5>
@@ -833,7 +826,7 @@
                                                     <span className="badge bg-dark border border-warning border-opacity-50 text-warning" style={{fontSize:'0.65rem'}}>{item.bulan} {item.tahun}</span>
                                                 </div>
                                                 <h6 className="text-white fw-bold mb-2 lh-base">{item.sekolah}</h6>
-                                                <div className="bg-dark px-2 py-1 rounded text-secondary fw-bold mb-3 border border-secondary border-opacity-25" style={{fontSize:'0.7rem'}}><i className="fas fa-user text-warning me-2"></i>{item.pendamping}</div>
+                                                <div className="bg-dark px-2 py-1 rounded text-white fw-bold mb-3 border border-warning border-opacity-50" style={{fontSize:'0.75rem'}}><i className="fas fa-user-tie text-warning me-2"></i>{item.pendamping || '-'}</div>
                                                 <div className="mt-auto">
                                                     {item.url!=='#' ? <a href={item.url} target="_blank" className="btn btn-sm btn-outline-danger w-100 fw-bold"><i className="fas fa-external-link-alt me-2"></i> Buka PDF</a> : <button disabled className="btn btn-sm btn-dark w-100 text-secondary">Offline</button>}
                                                 </div>
