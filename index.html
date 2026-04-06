@@ -12,6 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
+    
+    <!-- Library untuk Export Excel dan PDF (Dipertahankan dan Disempurnakan) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
@@ -64,9 +66,9 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // -----------------------------------------------------------------------------------------
-        // GANTI URL DI BAWAH INI DENGAN URL WEB APP BARU ANDA (YANG AKHIRANNYA /exec)
-        // -----------------------------------------------------------------------------------------
+        // =========================================================================
+        // URL WEB APP GAS (Ganti dengan URL /exec Anda)
+        // =========================================================================
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxsk4HRv1WvwrZcuCwxRyNJIk2cOpIX9Ug6vbWpqpRwV6o4cfPYMSDK_P1whRbCBl0W/exec"; 
 
         const { useState, useEffect, useRef } = React;
@@ -138,14 +140,14 @@
                 if (isAdmin) { setIsAdmin(false); showToast('Admin Logout berhasil.', 'info'); } 
                 else {
                     const password = window.prompt("Masukkan Password Akses Admin:");
-                    if (password === "admin123") { setIsAdmin(true); showToast('Login Admin Berhasil! Hak Penuh diaktifkan.', 'success'); } 
+                    if (password === "admin123") { setIsAdmin(true); showToast('Login Admin Berhasil!', 'success'); } 
                     else if (password !== null) { showToast('Password Salah!', 'error'); }
                 }
                 setIsNavOpen(false);
             };
 
             const handleDelete = async (timestamp) => {
-                if (!window.confirm("Peringatan: Yakin menghapus data & File PDF di Drive secara permanen?")) return;
+                if (!window.confirm("Peringatan: Yakin menghapus data & File PDF secara permanen?")) return;
                 showToast("Menghapus data...", "info");
                 try {
                     const resData = await fetchGAS({ action: 'delete', timestamp: timestamp });
@@ -154,18 +156,15 @@
                 } catch (e) { showToast("Gagal menghapus: " + e.message, "error"); }
             };
 
-            // FITUR TAMBAHAN 2: RESET SEMUA DATA (KHUSUS ADMIN)
             const handleResetAll = async () => {
                 if (!window.confirm("PERINGATAN KERAS! Anda yakin ingin MENGHAPUS SEMUA ISI DATABASE DAN SEMUA FILE PDF SECARA PERMANEN?")) return;
-                if (!window.confirm("Tindakan ini benar-benar tidak bisa dikembalikan. Lanjutkan Reset?")) return;
+                if (!window.confirm("Tindakan ini tidak bisa dikembalikan. Lanjutkan Reset?")) return;
                 
                 showToast("Sedang mereset seluruh sistem...", "info");
                 try {
                     const resData = await fetchGAS({ action: 'reset' });
-                    if (resData.status === 'success') { 
-                        showToast(resData.message, 'success'); 
-                        fetchData(); 
-                    } else throw new Error(resData.message);
+                    if (resData.status === 'success') { showToast(resData.message, 'success'); fetchData(); } 
+                    else throw new Error(resData.message);
                 } catch (e) { showToast("Gagal mereset: " + e.message, "error"); }
             };
 
@@ -187,7 +186,6 @@
                 });
             };
 
-            // FITUR TAMBAHAN 1: KOMPRESI PDF MAKSIMAL (~450KB)
             const processSingleImage = (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -197,18 +195,11 @@
                             try {
                                 const canvas = document.createElement('canvas');
                                 const ctx = canvas.getContext('2d');
-                                
-                                // KOMPRESI EKSTREM: Menurunkan Resolusi Maksimal ke 1000px agar ukuran PDF sangat kecil
-                                const maxWidth = 1000; 
-                                let width = img.width, height = img.height;
+                                const maxWidth = 1000; let width = img.width, height = img.height;
                                 if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
                                 canvas.width = width; canvas.height = height;
-                                
-                                // Filter Grayscale agar file lebih ringan tapi tetap terbaca AI
                                 ctx.filter = 'grayscale(100%) contrast(150%) brightness(105%)'; 
                                 ctx.drawImage(img, 0, 0, width, height);
-                                
-                                // KOMPRESI KUALITAS: Menurunkan kualitas JPEG ke 50% (Sangat kecil secara size, tapi jelas di mata)
                                 resolve(canvas.toDataURL('image/jpeg', 0.5)); 
                             } catch (e) { reject(e); }
                         };
@@ -250,7 +241,7 @@
                     const data = await fetchGAS({ action: 'extract_multiple', files: fileArray.map(f => ({ mimeType: f.mimeType, data: f.data })) });
                     if (data.status === 'success') {
                         const siswaArray = Array.isArray(data.data?.siswa) ? data.data.siswa : [];
-                        if (siswaArray.length === 0) throw new Error("File kosong, buram, atau tidak ada tabel ditemukan.");
+                        if (siswaArray.length === 0) throw new Error("File kosong atau tidak ada tabel ditemukan.");
 
                         const first = siswaArray[0];
                         const isMultiBulan = siswaArray.some(s => s.bulan !== first.bulan || s.tahun !== first.tahun);
@@ -289,7 +280,6 @@
                             const imgProps = doc.getImageProperties('data:image/jpeg;base64,' + f.data);
                             const pdfWidth = doc.internal.pageSize.getWidth();
                             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                            // KOMPRESI KEDUA DI SINI: Gunakan opsi 'FAST' agar output file PDF sangat kecil (~450kb max)
                             doc.addImage('data:image/jpeg;base64,' + f.data, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
                         });
                         finalPdfBase64 = doc.output('datauristring').split(',')[1];
@@ -307,12 +297,30 @@
             const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedFiles([]); };
             const saveSettings = () => { localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl); setBackendUrl(tempUrl); setShowSettings(false); showToast('URL API berhasil disimpan!', 'success'); };
 
+            // ==========================================
+            // FILTERING DATA DATABASE (SEMUA DATA)
+            // ==========================================
             const currentRecords = Array.isArray(records) ? records : [];
             const optionsPendamping = [...new Set(currentRecords.map(r => r?.pendamping))].filter(Boolean);
             const optionsBentuk = [...new Set(currentRecords.map(r => r?.bentuk))].filter(Boolean);
             const optionsTingkat = [...new Set(currentRecords.map(r => r?.tingkat))].filter(Boolean);
 
             const filteredKomponen = currentRecords.filter(item => {
+                if (!item) return false;
+                const matchSearch = Object.values(item).some(val => String(val || '').toLowerCase().includes(searchQuery.toLowerCase()));
+                return matchSearch && (filterPendamping ? item.pendamping === filterPendamping : true) && (filterBentuk ? item.bentuk === filterBentuk : true) && (filterTingkat ? item.tingkat === filterTingkat : true);
+            });
+
+            // ==========================================
+            // AGREGASI DATA UNTUK MENU DATA KOMPONEN (UNIK NISN)
+            // ==========================================
+            const uniqueMap = new Map();
+            currentRecords.forEach(r => {
+                if (r.nisn && !uniqueMap.has(r.nisn)) { uniqueMap.set(r.nisn, r); }
+            });
+            const uniqueStudents = Array.from(uniqueMap.values());
+            
+            const filteredUnique = uniqueStudents.filter(item => {
                 if (!item) return false;
                 const matchSearch = Object.values(item).some(val => String(val || '').toLowerCase().includes(searchQuery.toLowerCase()));
                 return matchSearch && (filterPendamping ? item.pendamping === filterPendamping : true) && (filterBentuk ? item.bentuk === filterBentuk : true) && (filterTingkat ? item.tingkat === filterTingkat : true);
@@ -330,32 +338,67 @@
                 const key = `${current.sekolah}-${current.bulan}-${current.tahun}-${current.pendamping}`;
                 if (!acc[key]) acc[key] = current; return acc;
             }, {});
-            
             const arsipUnik = Object.values(arsipDokumen);
             const filteredArsip = arsipUnik.filter(item => String(item.sekolah || '').toLowerCase().includes(searchArsip.toLowerCase()) || String(item.pendamping || '').toLowerCase().includes(searchArsip.toLowerCase()));
 
             const totalSekolahUnik = new Set(arsipUnik.map(a => a.sekolah)).size;
             const totalPendampingAktif = new Set(arsipUnik.map(a => a.pendamping)).size;
 
-            const exportToExcel = () => {
-                if (filteredKomponen.length === 0) return showToast("Tidak ada data", 'error');
+            // ==========================================
+            // EXPORT EXCEL & PDF - DIPERBAIKI (TIDAK ERROR LAGI)
+            // ==========================================
+            const exportToExcelDatabase = () => {
+                if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
                 try {
+                    if (!window.XLSX) throw new Error("Library SheetJS belum ter-load sempurna. Tunggu beberapa detik.");
                     const wsData = filteredKomponen.map((r, i) => ({ "No": i + 1, "Sekolah": r.sekolah, "Periode": `${r.bulan} ${r.tahun}`, "Pendamping": r.pendamping, "NIK Pengurus": r.nik_pengurus, "Nama Pengurus": r.nama_pengurus, "NIK Siswa": r.nik_siswa, "NISN": r.nisn, "Nama Siswa": r.nama_siswa, "Bentuk": r.bentuk, "Tingkat": r.tingkat }));
-                    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data");
-                    XLSX.writeFile(wb, `Data_Komponen_${new Date().getTime()}.xlsx`);
-                } catch (e) { showToast("Gagal mengekspor Excel", "error"); }
+                    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Database");
+                    XLSX.writeFile(wb, `Live_Database_${new Date().getTime()}.xlsx`);
+                    showToast("Berhasil mendownload Excel!", "success");
+                } catch (e) { console.error(e); showToast("Gagal mengekspor Excel: " + e.message, "error"); }
             };
 
-            const exportToPDF = () => {
-                if (filteredKomponen.length === 0) return showToast("Tidak ada data", 'error');
+            const exportToPDFDatabase = () => {
+                if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk dicetak", 'error');
                 try {
+                    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Library jsPDF belum ter-load sempurna.");
                     const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
-                    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Verifikasi", 14, 15);
-                    doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total: ${filteredKomponen.length} Siswa`, 14, 22);
+                    if (typeof doc.autoTable !== 'function') throw new Error("Library AutoTable belum ter-load.");
+                    
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Live Database", 14, 15);
+                    doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total Baris Data: ${filteredKomponen.length} (Bisa ada duplikat bulan)`, 14, 22);
                     const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
                     doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [37, 99, 235] }});
-                    doc.save(`Laporan_${new Date().getTime()}.pdf`);
-                } catch (e) { showToast("Gagal mencetak PDF", "error"); }
+                    doc.save(`Laporan_Database_${new Date().getTime()}.pdf`);
+                    showToast("Berhasil mendownload PDF!", "success");
+                } catch (e) { console.error(e); showToast("Gagal mencetak PDF: " + e.message, "error"); }
+            };
+
+            const exportToExcelUnik = () => {
+                if (filteredUnique.length === 0) return showToast("Tidak ada data unik untuk diekspor", 'error');
+                try {
+                    if (!window.XLSX) throw new Error("Library SheetJS belum ter-load sempurna.");
+                    const wsData = filteredUnique.map((r, i) => ({ "No": i + 1, "Nama Siswa": r.nama_siswa, "NISN": r.nisn, "NIK Siswa": r.nik_siswa, "Nama Pengurus": r.nama_pengurus, "NIK Pengurus": r.nik_pengurus, "Sekolah": r.sekolah, "Bentuk": r.bentuk, "Tingkat": r.tingkat, "Pendamping": r.pendamping }));
+                    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(wsData), "Data Unik");
+                    XLSX.writeFile(wb, `Data_Komponen_Unik_${new Date().getTime()}.xlsx`);
+                    showToast("Berhasil mendownload Excel Data Komponen!", "success");
+                } catch (e) { console.error(e); showToast("Gagal mengekspor Excel: " + e.message, "error"); }
+            };
+
+            const exportToPDFUnik = () => {
+                if (filteredUnique.length === 0) return showToast("Tidak ada data unik untuk dicetak", 'error');
+                try {
+                    if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Library jsPDF belum ter-load sempurna.");
+                    const doc = new window.jspdf.jsPDF('l', 'mm', 'a4');
+                    if (typeof doc.autoTable !== 'function') throw new Error("Library AutoTable belum ter-load.");
+                    
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Komponen (Siswa Unik)", 14, 15);
+                    doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total Siswa Tervalidasi: ${filteredUnique.length} (1 NISN = 1 Data)`, 14, 22);
+                    const tableData = filteredUnique.map((r, i) => [ i + 1, r.nama_siswa, r.nisn, r.nama_pengurus, r.sekolah, r.bentuk, r.tingkat, r.pendamping ]);
+                    doc.autoTable({ head: [['No', 'Nama Siswa', 'NISN', 'Nama Pengurus', 'Sekolah', 'Bentuk', 'Kelas', 'Pendamping']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 8 }, headStyles: { fillColor: [13, 148, 136] }});
+                    doc.save(`Laporan_Unik_${new Date().getTime()}.pdf`);
+                    showToast("Berhasil mendownload PDF Data Komponen!", "success");
+                } catch (e) { console.error(e); showToast("Gagal mencetak PDF: " + e.message, "error"); }
             };
 
             return (
@@ -424,7 +467,10 @@
                                 <ul className="nav nav-pills mt-3 mt-lg-0 gap-2 d-flex flex-column flex-lg-row align-items-lg-center w-100 justify-content-lg-end">
                                     <li className="nav-item"><button onClick={() => changeTab('upload')} className={`nav-link w-100 text-start ${activeTab === 'upload' ? 'active' : ''}`}><i className="fas fa-upload me-2"></i> Scan File</button></li>
                                     <li className="nav-item"><button onClick={() => changeTab('dashboard_komponen')} className={`nav-link w-100 text-start ${activeTab === 'dashboard_komponen' ? 'active' : ''}`}><i className="fas fa-chart-pie me-2"></i> Statistik</button></li>
-                                    <li className="nav-item"><button onClick={() => changeTab('data_komponen')} className={`nav-link w-100 text-start ${activeTab === 'data_komponen' ? 'active' : ''}`}><i className="fas fa-database me-2"></i> Database</button></li>
+                                    {/* MENU BARU: DATA KOMPONEN */}
+                                    <li className="nav-item"><button onClick={() => changeTab('komponen_unik')} className={`nav-link w-100 text-start ${activeTab === 'komponen_unik' ? 'active' : ''}`}><i className="fas fa-users me-2"></i> Data Komponen</button></li>
+                                    
+                                    <li className="nav-item"><button onClick={() => changeTab('data_komponen')} className={`nav-link w-100 text-start ${activeTab === 'data_komponen' ? 'active' : ''}`}><i className="fas fa-database me-2"></i> Live Database</button></li>
                                     <li className="nav-item"><button onClick={() => changeTab('dashboard_arsip')} className={`nav-link w-100 text-start ${activeTab === 'dashboard_arsip' ? 'active' : ''}`}><i className="fas fa-folder-open me-2"></i> Dash Arsip</button></li>
                                     <li className="nav-item"><button onClick={() => changeTab('arsip_pdf')} className={`nav-link w-100 text-start ${activeTab === 'arsip_pdf' ? 'active' : ''}`}><i className="fas fa-file-pdf me-2"></i> Arsip PDF</button></li>
                                     <li className="nav-item ms-lg-3 border-start border-secondary border-opacity-50 ps-lg-3 mt-2 mt-lg-0">
@@ -444,7 +490,7 @@
                                         <div className="card-custom p-5 text-center">
                                             <div className="mx-auto bg-dark text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 border border-secondary border-opacity-50" style={{width:'90px', height:'90px'}}><i className="fas fa-file-invoice fs-1"></i></div>
                                             <h1 className="fw-bold text-white mb-3">Multi-File AI Scanner</h1>
-                                            <p className="text-secondary fs-5 mb-5">Sistem Anti-Duplikasi Aktif. Tolak File Kosong. Pisah Periode Otomatis. Pilih PDF atau Foto. PDF terkompresi &lt;450kb.</p>
+                                            <p className="text-secondary fs-5 mb-5">Sistem Anti-Duplikasi Aktif. Tolak File Kosong. Pisah Periode Otomatis. Pilih PDF atau Foto. PDF terkompresi maks ~450kb.</p>
                                             <input type="file" multiple accept="image/*,.pdf" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
                                             <button onClick={() => fileInputRef.current.click()} className="btn btn-brand btn-lg px-5 py-3 fs-5 rounded-pill shadow"><i className="fas fa-upload me-2"></i> Pilih Dokumen (PDF/Foto)</button>
                                         </div>
@@ -498,7 +544,7 @@
                                             <p className="text-secondary mb-5 fs-5">Data diverifikasi. File PDF disimpan (dikompres maks ~450kb). Cek notifikasi untuk info duplikat.</p>
                                             <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
                                                 <button onClick={resetForm} className="btn btn-light-custom btn-lg px-4">Upload Lain</button>
-                                                <button onClick={() => setActiveTab('data_komponen')} className="btn btn-brand btn-lg px-4">Lihat Database Live</button>
+                                                <button onClick={() => setActiveTab('komponen_unik')} className="btn btn-brand btn-lg px-4">Lihat Data Komponen</button>
                                             </div>
                                         </div>
                                     )}
@@ -506,9 +552,9 @@
                             </div>
                         )}
 
-                        {/* FILTER BAR GLOBAL */}
+                        {/* FILTER BAR GLOBAL (Hanya muncul di tab yang butuh data) */}
                         {(() => {
-                            if(activeTab === 'dashboard_komponen' || activeTab === 'data_komponen') {
+                            if(activeTab === 'dashboard_komponen' || activeTab === 'data_komponen' || activeTab === 'komponen_unik') {
                                 return (
                                     <div className="card-custom p-4 mb-5 fade-in">
                                         <div className="row g-3">
@@ -533,7 +579,7 @@
                                 <div className="row g-4">
                                     <div className="col-12 col-lg-4 d-flex flex-column gap-4">
                                         <div className="card card-stats p-4 rounded-4 shadow h-100 justify-content-center">
-                                            <div className="text-white-50 fw-bold text-uppercase mb-2">Total Siswa</div>
+                                            <div className="text-white-50 fw-bold text-uppercase mb-2">Total Seluruh Data</div>
                                             <div className="display-3 fw-bold">{filteredKomponen.length}</div>
                                             <i className="fas fa-users position-absolute opacity-25" style={{fontSize:'8rem', right:'-20px', bottom:'-20px'}}></i>
                                         </div>
@@ -576,19 +622,78 @@
                             </div>
                         )}
 
-                        {/* 3. DATABASE */}
+                        {/* MENU BARU: DATA KOMPONEN (UNIK PER NISN) */}
+                        {activeTab === 'komponen_unik' && (
+                            <div className="fade-in d-flex flex-column" style={{height:'75vh'}}>
+                                <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom border-secondary border-opacity-50 pb-3">
+                                    <div className="d-flex align-items-center gap-3">
+                                        <div className="bg-info text-white p-3 rounded-4"><i className="fas fa-users fs-4"></i></div>
+                                        <div>
+                                            <h2 className="text-white fw-bold m-0">Data Komponen</h2>
+                                            <div className="text-info small fw-bold mt-1">1 Siswa (NISN) = 1 Baris (Tanpa duplikat bulan)</div>
+                                        </div>
+                                    </div>
+                                    <div className="d-flex gap-2">
+                                        <button onClick={exportToExcelUnik} className="btn btn-outline-success fw-bold"><i className="fas fa-file-excel me-2"></i> Excel</button>
+                                        <button onClick={exportToPDFUnik} className="btn btn-outline-danger fw-bold"><i className="fas fa-file-pdf me-2"></i> PDF</button>
+                                    </div>
+                                </div>
+
+                                <div className="card-custom rounded-4 flex-grow-1 overflow-hidden d-flex flex-column shadow">
+                                    <div className="table-responsive flex-grow-1 custom-scrollbar">
+                                        <table className="table table-dark table-hover mb-0">
+                                            <thead className="sticky-top" style={{zIndex:10}}>
+                                                <tr>
+                                                    <th className="p-4">Identitas Siswa</th>
+                                                    <th className="p-4">Pendidikan</th>
+                                                    <th className="p-4">Sekolah</th>
+                                                    <th className="p-4">Penanggung Jawab</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {loadingData ? <tr><td colSpan="4" className="text-center py-5"><div className="spinner-border text-info"></div></td></tr> :
+                                                 filteredUnique.length===0 ? <tr><td colSpan="4" className="text-center text-secondary py-5">Kosong</td></tr> :
+                                                 filteredUnique.map((r,i) => (
+                                                    <tr key={i}>
+                                                        <td className="p-4">
+                                                            <div className="fw-bold text-white fs-6">{r.nama_siswa}</div>
+                                                            <div className="text-secondary small mt-1">NISN: <span className="text-white fw-bold">{r.nisn}</span> | NIK: <span className="text-white fw-bold">{r.nik_siswa}</span></div>
+                                                        </td>
+                                                        <td className="p-4"><span className="badge bg-secondary text-white py-2 px-3 border border-secondary border-opacity-50">{r.bentuk} &bull; {r.tingkat}</span></td>
+                                                        <td className="p-4"><div className="text-white fw-bold">{r.sekolah}</div></td>
+                                                        <td className="p-4">
+                                                            <div className="text-secondary small mb-2"><i className="fas fa-user-tie me-1"></i> Wali: {r.nama_pengurus}</div>
+                                                            <div className="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-50 py-1 px-2"><i className="fas fa-user me-1"></i> {r.pendamping}</div>
+                                                        </td>
+                                                    </tr>
+                                                 ))
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="bg-dark p-3 border-top border-secondary border-opacity-25 d-flex justify-content-between text-secondary small fw-bold">
+                                        <span>Total Data Unik: {filteredUnique.length} Siswa (Telah Difilter)</span>
+                                        <span>Data Komponen Bersih</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 3. LIVE DATABASE (SEMUA DATA MENTAH) */}
                         {activeTab === 'data_komponen' && (
                             <div className="fade-in d-flex flex-column" style={{height:'75vh'}}>
                                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 border-bottom border-secondary border-opacity-50 pb-3">
                                     <div className="d-flex align-items-center gap-3">
                                         <div className="bg-success text-white p-3 rounded-4"><i className="fas fa-database fs-4"></i></div>
-                                        <h2 className="text-white fw-bold m-0">Live Database</h2>
+                                        <div>
+                                            <h2 className="text-white fw-bold m-0">Live Database</h2>
+                                            <div className="text-success small fw-bold mt-1">Data Raw (Bisa ada siswa sama di bulan berbeda)</div>
+                                        </div>
                                     </div>
-                                    <div className="d-flex gap-2">
-                                        <button onClick={exportToExcel} className="btn btn-outline-success fw-bold"><i className="fas fa-file-excel me-2"></i> Excel</button>
-                                        <button onClick={exportToPDF} className="btn btn-outline-danger fw-bold"><i className="fas fa-file-pdf me-2"></i> PDF</button>
-                                        {/* TOMBOL RESET DATABASE (KHUSUS ADMIN) */}
-                                        {isAdmin && <button onClick={handleResetAll} className="btn btn-outline-danger fw-bold ms-2"><i className="fas fa-trash-alt me-2"></i> Reset Database</button>}
+                                    <div className="d-flex flex-wrap gap-2">
+                                        <button onClick={exportToExcelDatabase} className="btn btn-outline-success fw-bold"><i className="fas fa-file-excel me-2"></i> Excel</button>
+                                        <button onClick={exportToPDFDatabase} className="btn btn-outline-danger fw-bold"><i className="fas fa-file-pdf me-2"></i> PDF</button>
+                                        {isAdmin && <button onClick={handleResetAll} className="btn btn-danger fw-bold"><i className="fas fa-trash-alt me-2"></i> Reset System</button>}
                                     </div>
                                 </div>
 
@@ -605,7 +710,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {loadingData ? <tr><td colSpan={isAdmin ? "5" : "4"} className="text-center py-5"><div className="spinner-border text-primary"></div></td></tr> :
+                                                {loadingData ? <tr><td colSpan={isAdmin ? "5" : "4"} className="text-center py-5"><div className="spinner-border text-success"></div></td></tr> :
                                                  filteredKomponen.length===0 ? <tr><td colSpan={isAdmin ? "5" : "4"} className="text-center text-secondary py-5">Kosong</td></tr> :
                                                  filteredKomponen.map((r,i) => (
                                                     <tr key={i}>
