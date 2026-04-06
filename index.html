@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
+        /* TEMA HITAM & KUNING (BLACK & YELLOW ENTERPRISE) */
         body { background-color: #000000; color: #e2e8f0; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #111111; }
@@ -75,6 +76,7 @@
         // BLUEPRINT URL
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzeMro5vHr-eLPbTRfAkhn0I4Bmfr_Ubs4dVTOmwOcppQFXegb317LC1fAjiduQ30_1/exec"; 
         const SPREADSHEET_DIRECT_URL = "https://docs.google.com/spreadsheets/d/1QerMqMttf-xYTuv6mEj0MJCujrNay9LJC2mFBFrC-vI/edit";
+        const GOOGLE_DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1GkKwOIv1W_FptawtRqRjbn8mP3SZntxQ"; // DITAMBAHKAN SESUAI PERMINTAAN
 
         const { useState, useEffect, useRef } = React;
 
@@ -98,7 +100,7 @@
             const [isNavOpen, setIsNavOpen] = useState(false);
             
             const [showSettings, setShowSettings] = useState(false);
-            const [showAdminModal, setShowAdminModal] = useState(false); // MODAL ADMIN BARU
+            const [showAdminModal, setShowAdminModal] = useState(false); 
             const [adminPasswordInput, setAdminPasswordInput] = useState('');
 
             const [backendUrl, setBackendUrl] = useState(localStorage.getItem('VERIFDIGI_BACKEND_URL') || GAS_WEB_APP_URL);
@@ -125,10 +127,19 @@
             const fileInputRef = useRef(null);
             const showToast = (message, type = 'success') => setToast({ message, type });
 
+            // PERBAIKAN: ERROR MESSAGE LEBIH JELAS
             const fetchGAS = async (payload) => {
                 const res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
                 const text = await res.text();
-                try { return JSON.parse(text); } catch (e) { throw new Error("Server Error:\n" + text.substring(0, 100)); }
+                try { 
+                    const data = JSON.parse(text); 
+                    if (data.status === 'error' && data.message && data.message.length > 100) {
+                        data.message = "Server Sibuk / API Limit. Coba lagi.";
+                    }
+                    return data; 
+                } catch (e) { 
+                    throw new Error("Koneksi Apps Script Gagal. Pastikan URL sudah benar dan jalankan fungsi PENGATURAN AWAL di backend."); 
+                }
             };
 
             const fetchData = async () => {
@@ -146,7 +157,6 @@
 
             const changeTab = (tab) => { setActiveTab(tab); setIsNavOpen(false); };
 
-            // LOGIKA MODAL ADMIN BARU (MODERN POPUP)
             const handleAdminLoginSubmit = (e) => {
                 e.preventDefault();
                 if (adminPasswordInput === "admin123") {
@@ -178,6 +188,7 @@
             const handleResetAll = async () => {
                 if (!window.confirm("PERINGATAN KERAS! Anda yakin ingin MENGHAPUS SEMUA ISI DATABASE DAN SEMUA FILE PDF SECARA PERMANEN?")) return;
                 if (!window.confirm("Tindakan ini tidak bisa dikembalikan. Lanjutkan Reset?")) return;
+                
                 showToast("Sedang mereset seluruh sistem...", "info");
                 try {
                     const resData = await fetchGAS({ action: 'reset' });
@@ -337,7 +348,6 @@
                 return matchSearch && (filterPendamping ? item.pendamping === filterPendamping : true) && (filterBentuk ? item.bentuk === filterBentuk : true) && (filterTingkat ? item.tingkat === filterTingkat : true);
             });
 
-            // KUNCI: FILTER KOMPONEN UNIK MUTLAK
             const uniqueMap = new Map();
             const seenNisn = new Set();
             const seenNama = new Set();
@@ -458,7 +468,8 @@
                                             <div className="text-center">
                                                 <div className="text-success fw-bold mb-4"><i className="fas fa-check-circle me-1"></i> Anda telah login sebagai Admin</div>
                                                 <div className="d-flex flex-column gap-3">
-                                                    <a href={SPREADSHEET_DIRECT_URL} target="_blank" className="btn btn-outline-success fw-bold p-3"><i className="fas fa-external-link-alt me-2"></i> Buka Link Database (Spreadsheet)</a>
+                                                    <a href={SPREADSHEET_DIRECT_URL} target="_blank" className="btn btn-outline-success fw-bold p-3"><i className="fas fa-file-excel me-2"></i> Buka Database Spreadsheet</a>
+                                                    <a href={GOOGLE_DRIVE_FOLDER_URL} target="_blank" className="btn btn-outline-warning fw-bold p-3"><i className="fas fa-folder-open me-2"></i> Buka Folder Google Drive (PDF)</a>
                                                     <button onClick={handleAdminLogout} className="btn btn-outline-danger fw-bold p-3"><i className="fas fa-sign-out-alt me-2"></i> Keluar (Logout)</button>
                                                 </div>
                                             </div>
@@ -497,6 +508,26 @@
                                             <button type="submit" className="btn btn-warning fw-bold">Simpan</button>
                                         </div>
                                     </form>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showSettings && (
+                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.8)'}} tabIndex="-1">
+                            <div className="modal-dialog modal-dialog-centered">
+                                <div className="modal-content card-custom">
+                                    <div className="modal-header border-secondary border-opacity-50 pb-3">
+                                        <h5 className="modal-title fw-bold text-white"><i className="fas fa-server text-warning me-2"></i> Setup API</h5>
+                                    </div>
+                                    <div className="modal-body py-4">
+                                        <label className="form-label text-secondary fw-bold small">URL Google Apps Script</label>
+                                        <input type="text" className="form-control bg-dark text-white border-secondary border-opacity-50" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/..." />
+                                    </div>
+                                    <div className="modal-footer border-0 pt-0">
+                                        <button type="button" className="btn btn-light-custom" onClick={() => setShowSettings(false)}>Batal</button>
+                                        <button type="button" className="btn btn-brand" onClick={saveSettings}>Simpan URL</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
