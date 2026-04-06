@@ -111,6 +111,7 @@
 
             const [uploadState, setUploadState] = useState('idle'); 
             const [processedFiles, setProcessedFiles] = useState([]); 
+            const [stagedFiles, setStagedFiles] = useState([]); // TAMBAHAN: Untuk menampung multi halaman
             const [extractedData, setExtractedData] = useState({ sekolah: '', bulan: '', tahun: '', siswa: [] });
             
             const [records, setRecords] = useState([]);
@@ -203,6 +204,7 @@
                 });
             };
 
+            // PERBAIKAN: AUTO-ROTATE KE LANDSCAPE JIKA PORTRAIT (TIDAK PERNAH TERPOTONG)
             const processSingleImage = (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -213,11 +215,31 @@
                                 const canvas = document.createElement('canvas');
                                 const ctx = canvas.getContext('2d');
                                 const maxWidth = 1200; 
-                                let width = img.width, height = img.height;
-                                if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
-                                canvas.width = width; canvas.height = height;
                                 
-                                ctx.drawImage(img, 0, 0, width, height);
+                                // Deteksi otomatis jika foto berdiri (Portrait)
+                                let isPortrait = img.height > img.width;
+                                
+                                // Kalkulasi agar hasil akhir selalu dipaksa Mendatar (Landscape)
+                                let calcWidth = isPortrait ? img.height : img.width;
+                                let calcHeight = isPortrait ? img.width : img.height;
+
+                                if (calcWidth > maxWidth) { 
+                                    calcHeight = Math.round((calcHeight * maxWidth) / calcWidth); 
+                                    calcWidth = maxWidth; 
+                                }
+
+                                canvas.width = calcWidth; 
+                                canvas.height = calcHeight;
+                                
+                                if (isPortrait) {
+                                    // Putar 90 Derajat
+                                    ctx.translate(calcWidth / 2, calcHeight / 2);
+                                    ctx.rotate(-Math.PI / 2);
+                                    ctx.drawImage(img, -calcHeight / 2, -calcWidth / 2, calcHeight, calcWidth);
+                                } else {
+                                    ctx.drawImage(img, 0, 0, calcWidth, calcHeight);
+                                }
+                                
                                 resolve(canvas.toDataURL('image/jpeg', 0.5)); 
                             } catch (e) { reject(e); }
                         };
@@ -227,6 +249,7 @@
                 });
             };
 
+            // PERBAIKAN: FITUR "STAGING" AGAR BISA UPLOAD BERTAHAP MULTI HALAMAN (TIDAK TERCAMPUR)
             const handleFileChange = async (e) => {
                 try {
                     const files = Array.from(e.target.files || []);
@@ -234,7 +257,7 @@
                     if (!backendUrl) return showToast('Masukkan URL Google Apps Script!', 'error');
                     
                     setUploadState('processing_image');
-                    const fileArray = [];
+                    const fileArray = [...stagedFiles]; // Menambahkan file baru ke antrean yang sudah ada
 
                     for (let file of files) {
                         const fileExt = file.name.toLowerCase();
@@ -248,8 +271,8 @@
                     }
 
                     if (fileArray.length === 0) throw new Error("Format file tidak didukung");
-                    setProcessedFiles(fileArray);
-                    extractTextFromFiles(fileArray);
+                    setStagedFiles(fileArray);
+                    setUploadState('staged'); // Mengubah state agar User bisa klik Tambah lagi
                 } catch (error) { setUploadState('idle'); showToast('Gagal memproses file: ' + error.message, 'error'); }
             };
 
@@ -292,7 +315,7 @@
                         finalPdfBase64 = pdfFile.data;
                     } else {
                         if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("Library PDF gagal dimuat.");
-                        const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: [210, 330] });
+                        const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: [210, 330] }); // F4 Landscape Mutlak
                         processedFiles.forEach((f, index) => {
                             if (index > 0) doc.addPage();
                             const imgProps = doc.getImageProperties('data:image/jpeg;base64,' + f.data);
@@ -312,7 +335,7 @@
                 } catch (err) { showToast('Gagal menyimpan: ' + err.message, 'error'); setUploadState('form'); }
             };
 
-            const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedFiles([]); };
+            const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedFiles([]); setStagedFiles([]); };
             const saveSettings = () => { localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl); setBackendUrl(tempUrl); setShowSettings(false); showToast('URL API berhasil disimpan!', 'success'); };
 
             const currentRecords = Array.isArray(records) ? records : [];
@@ -326,9 +349,6 @@
                 return matchSearch && (filterPendamping ? item.pendamping === filterPendamping : true) && (filterBentuk ? item.bentuk === filterBentuk : true) && (filterTingkat ? item.tingkat === filterTingkat : true);
             });
 
-            // ==========================================
-            // PERBAIKAN MUTLAK: AGREGASI DATA KOMPONEN (1 NISN ATAU 1 NAMA = 1 DATA BARIS)
-            // ==========================================
             const uniqueMap = new Map();
             const seenNisn = new Set();
             const seenNama = new Set();
@@ -376,9 +396,6 @@
             const totalSekolahUnik = new Set(arsipUnik.map(a => a.sekolah)).size;
             const totalPendampingAktif = new Set(arsipUnik.map(a => a.pendamping)).size;
 
-            // ==========================================
-            // EXPORT EXCEL & PDF - DIPERBAIKI MUTLAK
-            // ==========================================
             const exportToExcelDatabase = () => {
                 if (filteredKomponen.length === 0) return showToast("Tidak ada data untuk diekspor", 'error');
                 try {
@@ -512,16 +529,49 @@
                                         <div className="card-custom p-4 p-md-5 text-center">
                                             <div className="mx-auto bg-dark text-warning rounded-circle d-flex align-items-center justify-content-center mb-4 border border-warning border-opacity-50" style={{width:'70px', height:'70px'}}><i className="fas fa-file-invoice fs-2"></i></div>
                                             <h2 className="fw-bold text-white mb-3">Multi-File AI Scanner</h2>
-                                            <p className="text-secondary mb-4 small fw-bold">Sistem Anti-Duplikasi Aktif. Pilih PDF atau Foto. (PDF Berwarna maks ~450kb).</p>
+                                            
+                                            {/* PEMBERITAHUAN ATURAN FOTO LANDSCAPE */}
+                                            <div className="alert border-warning bg-warning bg-opacity-10 text-warning small fw-bold text-start mb-4 rounded-3 p-3">
+                                                <i className="fas fa-exclamation-triangle me-2 mb-2 fs-6"></i> <span className="text-uppercase">Aturan Foto Maksimal:</span><br/>
+                                                <ul className="mb-0 mt-1 ps-3" style={{lineHeight: '1.6'}}>
+                                                    <li>Posisi kamera <strong>WAJIB MENDATAR (LANDSCAPE)</strong>.</li>
+                                                    <li>Jika terpaksa berdiri, sistem akan otomatis merotasinya.</li>
+                                                    <li>Hasil akhir otomatis menjadi F4 Landscape.</li>
+                                                    <li>Anda bisa tambah foto jika lebih dari 1 halaman.</li>
+                                                </ul>
+                                            </div>
+
                                             <input type="file" multiple accept="image/*,.pdf" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
-                                            <button onClick={() => fileInputRef.current.click()} className="btn btn-brand w-100 py-3 shadow"><i className="fas fa-upload me-2"></i> Pilih Dokumen (PDF/Foto)</button>
+                                            <button onClick={() => fileInputRef.current.click()} className="btn btn-brand w-100 py-3 shadow"><i className="fas fa-camera me-2"></i> Pilih / Ambil Foto</button>
+                                        </div>
+                                    )}
+
+                                    {/* MENU STAGING: TAMBAH HALAMAN (TIDAK TERCAMPUR) */}
+                                    {uploadState === 'staged' && (
+                                        <div className="card-custom p-4 p-md-5 text-center fade-in">
+                                            <div className="mx-auto bg-dark text-warning rounded-circle d-flex align-items-center justify-content-center mb-4 border border-warning border-opacity-50" style={{width:'70px', height:'70px'}}><i className="fas fa-layer-group fs-2"></i></div>
+                                            <h3 className="fw-bold text-white mb-2">Dokumen Siap</h3>
+                                            <p className="text-secondary mb-4 small fw-bold">{stagedFiles.length} Halaman / File ditambahkan. (File tidak tercampur)</p>
+                                            
+                                            <input type="file" multiple accept="image/*,.pdf" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
+                                            
+                                            <div className="d-flex flex-column gap-3">
+                                                <button onClick={() => fileInputRef.current.click()} className="btn btn-outline-warning py-3 fw-bold w-100"><i className="fas fa-plus me-2"></i> Tambah Halaman Lain</button>
+                                                <button onClick={() => {
+                                                    setProcessedFiles(stagedFiles);
+                                                    extractTextFromFiles(stagedFiles);
+                                                }} className="btn btn-brand py-3 shadow w-100"><i className="fas fa-magic me-2"></i> Mulai Ekstrak AI</button>
+                                            </div>
+                                            <div className="mt-4">
+                                                <button onClick={resetForm} className="btn btn-link text-secondary text-decoration-none small"><i className="fas fa-times me-1"></i> Batalkan Semua</button>
+                                            </div>
                                         </div>
                                     )}
 
                                     {(uploadState === 'processing_image' || uploadState === 'extracting' || uploadState === 'saving') && (
                                         <div className="card-custom p-4 p-md-5 text-center">
                                             <div className="spinner-border text-warning mb-4" role="status"></div>
-                                            <h4 className="fw-bold text-white mb-2">{uploadState === 'processing_image' ? `Memproses Dokumen & Mengompres...` : uploadState === 'extracting' ? 'AI Menyisir Baris Tabel Secara Utuh...' : 'Menyimpan Data...'}</h4>
+                                            <h4 className="fw-bold text-white mb-2">{uploadState === 'processing_image' ? `Memproses Dokumen...` : uploadState === 'extracting' ? 'AI Menyisir Baris Tabel Secara Utuh...' : 'Menyimpan Data...'}</h4>
                                         </div>
                                     )}
 
@@ -563,7 +613,7 @@
                                         <div className="card-custom p-4 p-md-5 text-center border-top border-warning border-4 fade-in">
                                             <i className="fas fa-check-circle text-warning mx-auto mb-3" style={{fontSize: '4rem'}}></i>
                                             <h3 className="text-white fw-bold mb-2">Berhasil!</h3>
-                                            <p className="text-secondary mb-4 small fw-bold">Data diverifikasi. PDF disimpan (Full Color). Cek notifikasi.</p>
+                                            <p className="text-secondary mb-4 small fw-bold">Data diverifikasi. PDF disimpan (Full Color, Landscape). Cek notifikasi.</p>
                                             <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
                                                 <button onClick={resetForm} className="btn btn-light-custom px-4">Upload Lain</button>
                                                 <button onClick={() => setActiveTab('komponen_unik')} className="btn btn-brand px-4">Lihat Data</button>
