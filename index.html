@@ -17,60 +17,54 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* TEMA BIRU & PUTIH MODERN (KINERJA TINGGI UNTUK HP 2GB RAM) */
-        body { background-color: #f0f4f8; color: #1e293b; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        /* TEMA HITAM & ORANGE GLOSSY (KINERJA TINGGI & KONTRAS MUTLAK) */
+        body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         
-        /* Scrollbar Ringan */
         ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+        ::-webkit-scrollbar-track { background: #111111; }
+        ::-webkit-scrollbar-thumb { background: #ff7900; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff9900; }
         .hide-scroll::-webkit-scrollbar { display: none; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         
-        /* Header - Tanpa blur agar tidak lag di HP RAM kecil */
-        .glass-header { background: rgba(255, 255, 255, 0.98); border-bottom: 1px solid #e2e8f0; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .glass-header { background: rgba(5, 5, 5, 0.98); border-bottom: 1px solid #333333; box-shadow: 0 4px 15px rgba(255, 121, 0, 0.1); }
+        .card-custom { background-color: #111111; border: 1px solid #333333; border-radius: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .card-stats { background: linear-gradient(135deg, #1f140b, #000000); border: 1px solid #ff7900; color: #ffffff; box-shadow: 0 4px 15px rgba(255, 121, 0, 0.15); }
         
-        /* Cards - Putih bersih, border lembut, shadow ringan */
-        .card-custom { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.04); }
-        .card-stats { background: linear-gradient(135deg, #1e3a8a, #3b82f6); border: none; color: white; box-shadow: 0 4px 10px rgba(37,99,235,0.15); }
+        .nav-pills .nav-link { color: #aaaaaa; border-radius: 0.6rem; padding: 8px 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; border: none; background: transparent; font-size: 0.9rem;}
+        .nav-pills .nav-link:hover { background-color: #222222; color: #ff9900; }
+        .nav-pills .nav-link.active { background: linear-gradient(145deg, #ff8c00, #e65c00); color: #000000; box-shadow: 0 2px 8px rgba(255, 136, 0, 0.4); }
         
-        /* Nav Pills - Kontras Tinggi */
-        .nav-pills .nav-link { color: #64748b; border-radius: 0.6rem; padding: 8px 16px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; border: none; background: transparent; font-size: 0.9rem;}
-        .nav-pills .nav-link:hover { background-color: #f1f5f9; color: #1d4ed8; }
-        .nav-pills .nav-link.active { background-color: #2563eb; color: #ffffff; box-shadow: 0 2px 6px rgba(37,99,235,0.2); }
+        .form-control, .form-select { background-color: #000000; border: 1px solid #444444; color: #ffffff; border-radius: 0.6rem; padding: 10px 14px; font-size: 0.9rem; font-weight: 600;}
+        .form-control:focus, .form-select:focus { background-color: #111111; border-color: #ff8c00; color: #ffffff; box-shadow: 0 0 0 0.2rem rgba(255, 136, 0, 0.25); }
         
-        /* Inputs - Putih, Teks Hitam Pekat */
-        .form-control, .form-select { background-color: #ffffff; border: 1px solid #cbd5e1; color: #0f172a; border-radius: 0.6rem; padding: 10px 14px; font-size: 0.9rem; font-weight: 500;}
-        .form-control:focus, .form-select:focus { background-color: #ffffff; border-color: #2563eb; color: #0f172a; box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15); }
-        
-        /* Tables - Modern Light Theme */
-        .table { color: #1e293b; font-size: 0.85rem; margin-bottom: 0;}
-        .table th { background-color: #f8fafc; border-bottom: 2px solid #cbd5e1; color: #475569; text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; padding: 12px;}
-        .table td { background-color: #ffffff; border-bottom: 1px solid #f1f5f9; vertical-align: middle; color: #0f172a; padding: 12px;}
-        .table-hover>tbody>tr:hover>td { background-color: #eff6ff; color: #1d4ed8; }
+        .table { color: #ffffff; font-size: 0.85rem; margin-bottom: 0;}
+        .table th { background-color: #111111; border-bottom: 2px solid #ff8c00; color: #ff8c00; text-transform: uppercase; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.5px; padding: 12px;}
+        .table td { background-color: #0a0a0a; border-bottom: 1px solid #222222; vertical-align: middle; color: #ffffff; padding: 12px; font-weight: 500;}
+        .table-hover>tbody>tr:hover>td { background-color: #1a1a1a; color: #ff9900; }
 
-        /* Buttons - Glossy Blue Ringan */
-        .btn-brand { background: linear-gradient(180deg, #3b82f6, #2563eb); border: 1px solid #1d4ed8; color: #ffffff; border-radius: 0.6rem; padding: 10px 20px; font-weight: 600; font-size: 0.9rem; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 4px rgba(37,99,235,0.15);}
-        .btn-brand:hover { background: linear-gradient(180deg, #60a5fa, #3b82f6); color: #ffffff;}
-        .btn-light-custom { background-color: #f8fafc; color: #334155; border: 1px solid #e2e8f0; border-radius: 0.6rem; padding: 10px 20px; font-weight: 600; font-size: 0.9rem;}
-        .btn-light-custom:hover { background-color: #e2e8f0; color: #0f172a; }
+        .btn-brand { background: linear-gradient(145deg, #ff8c00, #e65c00); border: 1px solid #cc5500; color: #000000; border-radius: 0.6rem; padding: 10px 20px; font-weight: 800; font-size: 0.9rem; box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 10px rgba(255, 136, 0, 0.2);}
+        .btn-brand:hover { background: linear-gradient(145deg, #ffa633, #ff8c00); color: #000000; transform: translateY(-2px);}
+        .btn-light-custom { background-color: #1a1a1a; color: #ff8c00; border: 1px solid #ff8c00; border-radius: 0.6rem; padding: 10px 20px; font-weight: 800; font-size: 0.9rem;}
+        .btn-light-custom:hover { background-color: #ff8c00; color: #000000; }
 
         .fade-in { animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Notif melayang bersih */
         .toast-container-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 90%; max-width: 400px; display: flex; flex-direction: column; gap: 10px;}
-        .toast-custom { background: #ffffff; border-left: 4px solid #2563eb; border-radius: 8px; padding: 12px 20px; color: #0f172a; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: slideDown 0.3s ease-out forwards;}
+        .toast-custom { background: #111111; border-left: 4px solid #ff8c00; border-radius: 8px; padding: 12px 20px; color: #ffffff; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.8); animation: slideDown 0.3s ease-out forwards;}
         @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         .mobile-menu-collapse { display: none; }
         .mobile-menu-collapse.show { display: block; animation: fadeIn 0.2s; }
         @media (min-width: 992px) { .mobile-menu-collapse { display: block !important; } }
         
-        /* Helper Classes untuk Kontras Mutlak */
-        .text-primary-dark { color: #1e3a8a !important; }
-        .bg-light-blue { background-color: #eff6ff !important; border: 1px solid #bfdbfe !important; }
+        /* Helper Classes for High Contrast Orange */
+        .text-orange { color: #ff8c00 !important; }
+        .bg-orange { background-color: #ff8c00 !important; color: #000000 !important;}
+        .bg-orange-dark { background-color: #2a1600 !important; border: 1px solid #ff8c00 !important; }
+        .border-orange { border-color: #ff8c00 !important; }
+        .text-light-gray { color: #dddddd !important; }
     </style>
 </head>
 <body>
@@ -78,7 +72,7 @@
 
     <script type="text/babel">
         // BLUEPRINT URL (DIKUNCI)
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZBqWgoHMlCzh80XYEu6FVtG4gWFqExBDoCTWRPjbngb5_I-6m14RJ84XbwhP6_3xn/exec"; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbze5WZ8ltxnxH-bhDvhLNpyoLyvQAEj185HTlpRxtEfDzwnzV-ZC5aJUaPz5HVRq6VB/exec"; 
         const SPREADSHEET_DIRECT_URL = "https://docs.google.com/spreadsheets/d/1QerMqMttf-xYTuv6mEj0MJCujrNay9LJC2mFBFrC-vI/edit";
         const GOOGLE_DRIVE_FOLDER_URL = "https://drive.google.com/drive/folders/1GkKwOIv1W_FptawtRqRjbn8mP3SZntxQ"; 
 
@@ -86,15 +80,15 @@
 
         const ToastMessage = ({ message, type, onClose }) => {
             useEffect(() => { const timer = setTimeout(onClose, 5000); return () => clearTimeout(timer); }, [onClose]);
-            const iconColor = type === 'error' ? 'text-danger' : type === 'success' ? 'text-success' : 'text-primary';
+            const iconColor = type === 'error' ? 'text-danger' : type === 'success' ? 'text-success' : 'text-orange';
             const icon = type === 'error' ? 'fa-triangle-exclamation' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
             return (
-                <div className="toast-custom">
+                <div className="toast-custom border-orange">
                     <div className="d-flex align-items-center gap-2">
                         <i className={`fas ${icon} ${iconColor} fs-5`}></i>
-                        <span>{message}</span>
+                        <span className="text-white">{message}</span>
                     </div>
-                    <button type="button" className="btn-close btn-close-dark" style={{fontSize: '0.6rem', opacity: 0.5}} onClick={onClose}></button>
+                    <button type="button" className="btn-close btn-close-white" style={{fontSize: '0.6rem', opacity: 0.8}} onClick={onClose}></button>
                 </div>
             );
         };
@@ -209,6 +203,17 @@
                 } catch (e) { showToast("Gagal mengupdate: " + e.message, "error"); }
             };
 
+            // PERBAIKAN 4: FITUR COPY LINK FOLDER ADMIN
+            const copyFolderLink = () => {
+                const dummy = document.createElement("textarea");
+                document.body.appendChild(dummy);
+                dummy.value = GOOGLE_DRIVE_FOLDER_URL;
+                dummy.select();
+                document.execCommand("copy");
+                document.body.removeChild(dummy);
+                showToast("Link Folder Drive berhasil disalin ke Clipboard!", "success");
+            };
+
             const readFileAsBase64 = (file) => {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -278,22 +283,38 @@
                 try {
                     const data = await fetchGAS({ action: 'extract_multiple', files: fileArray.map(f => ({ mimeType: f.mimeType, data: f.data })) });
                     if (data.status === 'success') {
-                        const siswaArray = Array.isArray(data.data?.siswa) ? data.data.siswa : [];
-                        if (siswaArray.length === 0) throw new Error("File kosong atau tidak ada tabel ditemukan.");
+                        let rawSiswa = Array.isArray(data.data?.siswa) ? data.data.siswa : [];
+                        if (rawSiswa.length === 0) throw new Error("File kosong atau tidak ada tabel ditemukan.");
 
-                        const first = siswaArray[0];
-                        const isMultiBulan = siswaArray.some(s => s.bulan !== first.bulan || s.tahun !== first.tahun);
-                        const isMultiSekolah = siswaArray.some(s => s.sekolah !== first.sekolah);
-
+                        // PERBAIKAN 1: OTOMATIS JADIKAN SEMUA HURUF KAPITAL (UPPERCASE)
                         const safeData = {
-                            sekolah: isMultiSekolah ? 'Multi-Sekolah (Lihat Baris)' : (first.sekolah || 'Tidak Terdeteksi'),
-                            bulan: isMultiBulan ? 'Multi-Periode (Lihat Baris)' : (first.bulan || '-'),
-                            tahun: isMultiBulan ? '-' : (first.tahun || '-'),
-                            siswa: siswaArray 
+                            sekolah: String(data.data.sekolah || rawSiswa[0].sekolah || 'Tidak Terdeteksi').toUpperCase(),
+                            bulan: String(data.data.bulan || rawSiswa[0].bulan || '-').toUpperCase(),
+                            tahun: String(data.data.tahun || rawSiswa[0].tahun || '-').toUpperCase(),
+                            siswa: rawSiswa.map(s => ({
+                                sekolah: String(s.sekolah || '').toUpperCase(),
+                                bulan: String(s.bulan || '').toUpperCase(),
+                                tahun: String(s.tahun || '').toUpperCase(),
+                                nik_pengurus: String(s.nik_pengurus || '').toUpperCase(),
+                                nama_pengurus: String(s.nama_pengurus || '').toUpperCase(),
+                                nik_siswa: String(s.nik_siswa || '').toUpperCase(),
+                                nisn: String(s.nisn || '').toUpperCase(),
+                                nama_siswa: String(s.nama_siswa || '').toUpperCase(),
+                                bentuk: String(s.bentuk || '').toUpperCase(),
+                                tingkat: String(s.tingkat || '').toUpperCase(),
+                                pendamping: String(s.pendamping || '').toUpperCase()
+                            }))
                         };
+
+                        const isMultiBulan = safeData.siswa.some(s => s.bulan !== safeData.siswa[0].bulan || s.tahun !== safeData.siswa[0].tahun);
+                        const isMultiSekolah = safeData.siswa.some(s => s.sekolah !== safeData.siswa[0].sekolah);
+
+                        safeData.sekolah = isMultiSekolah ? 'MULTI-SEKOLAH (LIHAT BARIS)' : safeData.sekolah;
+                        safeData.bulan = isMultiBulan ? 'MULTI-PERIODE (LIHAT BARIS)' : safeData.bulan;
+                        safeData.tahun = isMultiBulan ? '-' : safeData.tahun;
                         
                         setExtractedData(safeData); setUploadState('form');
-                        showToast(`Berhasil mengekstrak ${siswaArray.length} baris data utuh!`, 'success');
+                        showToast(`Berhasil mengekstrak ${rawSiswa.length} baris data utuh!`, 'success');
                     } else throw new Error(data.message || "Error dari AI");
                 } catch (err) { 
                     let errorMsg = err.message;
@@ -328,7 +349,8 @@
                         finalPdfBase64 = doc.output('datauristring').split(',')[1];
                     }
 
-                    const payload = { action: 'save', pdfBase64: finalPdfBase64, siswa: extractedData.siswa || [] };
+                    // Data sudah uppercase saat Extract, Payload aman.
+                    const payload = { action: 'save', pdfBase64: finalPdfBase64, sekolah: extractedData.sekolah, bulan: extractedData.bulan, tahun: extractedData.tahun, siswa: extractedData.siswa || [] };
                     const resData = await fetchGAS(payload);
                     if (resData.status !== 'success') throw new Error(resData.message);
                     
@@ -415,7 +437,7 @@
                     doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Live Database", 14, 15);
                     doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total Baris Data: ${filteredKomponen.length} (Bisa ada duplikat bulan)`, 14, 22);
                     const tableData = filteredKomponen.map((r, i) => [ i + 1, r.sekolah, r.pendamping, r.nama_pengurus, r.nisn, r.nama_siswa, r.bentuk, r.tingkat ]);
-                    doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255] }});
+                    doc.autoTable({ head: [['No', 'Sekolah', 'Pendamping', 'Pengurus', 'NISN', 'Siswa', 'Bentuk', 'Kelas']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [255, 136, 0], textColor: [0, 0, 0] }});
                     doc.save(`Laporan_Database_${new Date().getTime()}.pdf`);
                     showToast("Berhasil mendownload PDF!", "success");
                 } catch (e) { console.error(e); showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
@@ -438,7 +460,7 @@
                     doc.setFont('helvetica', 'bold'); doc.setFontSize(16); doc.text("Laporan Data Komponen (Siswa Unik)", 14, 15);
                     doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.text(`Total Siswa Tervalidasi: ${filteredUnique.length} (1 NISN / Nama = 1 Data)`, 14, 22);
                     const tableData = filteredUnique.map((r, i) => [ i + 1, r.nama_siswa, r.nisn, r.nama_pengurus, r.sekolah, r.bentuk, r.tingkat, r.pendamping ]);
-                    doc.autoTable({ head: [['No', 'Nama Siswa', 'NISN', 'Nama Pengurus', 'Sekolah', 'Bentuk', 'Kelas', 'Pendamping']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255] }});
+                    doc.autoTable({ head: [['No', 'Nama Siswa', 'NISN', 'Nama Pengurus', 'Sekolah', 'Bentuk', 'Kelas', 'Pendamping']], body: tableData, startY: 28, theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [255, 136, 0], textColor: [0, 0, 0] }});
                     doc.save(`Laporan_Unik_${new Date().getTime()}.pdf`);
                     showToast("Berhasil mendownload PDF Data Komponen!", "success");
                 } catch (e) { console.error(e); showToast("Gagal mencetak PDF: Tunggu loading sebentar", "error"); }
@@ -452,17 +474,17 @@
 
                     {/* MODAL ADMIN MODERN */}
                     {showAdminModal && (
-                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.4)'}} tabIndex="-1">
+                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.6)'}} tabIndex="-1">
                             <div className="modal-dialog modal-dialog-centered">
-                                <div className="modal-content card-custom">
+                                <div className="modal-content card-custom border-orange">
                                     <div className="modal-header border-secondary border-opacity-50 pb-3">
-                                        <h5 className="modal-title fw-bold text-dark"><i className="fas fa-user-shield text-primary me-2"></i> {isAdmin ? 'Admin Dashboard' : 'Login Admin'}</h5>
+                                        <h5 className="modal-title fw-bold text-white"><i className="fas fa-user-shield text-orange me-2"></i> {isAdmin ? 'Admin Dashboard' : 'Login Admin'}</h5>
                                     </div>
                                     <div className="modal-body py-4">
                                         {!isAdmin ? (
                                             <form onSubmit={handleAdminLoginSubmit}>
-                                                <label className="form-label text-secondary fw-bold small">Masukkan Password</label>
-                                                <input type="password" autoFocus className="form-control border-secondary mb-3" value={adminPasswordInput} onChange={e => setAdminPasswordInput(e.target.value)} placeholder="••••••••" required />
+                                                <label className="form-label text-light-gray fw-bold small">Masukkan Password</label>
+                                                <input type="password" autoFocus className="form-control bg-black text-white border-secondary mb-3" value={adminPasswordInput} onChange={e => setAdminPasswordInput(e.target.value)} placeholder="••••••••" required />
                                                 <div className="d-flex gap-2">
                                                     <button type="button" className="btn btn-light-custom w-50" onClick={() => setShowAdminModal(false)}>Batal</button>
                                                     <button type="submit" className="btn btn-brand w-50">Login</button>
@@ -472,9 +494,12 @@
                                             <div className="text-center">
                                                 <div className="text-success fw-bold mb-4"><i className="fas fa-check-circle me-1"></i> Anda telah login sebagai Admin</div>
                                                 <div className="d-flex flex-column gap-3">
-                                                    <a href={SPREADSHEET_DIRECT_URL} target="_blank" className="btn btn-light-custom fw-bold p-3 text-start"><i className="fas fa-file-excel me-2 text-success"></i> Buka Database Spreadsheet</a>
-                                                    <a href={GOOGLE_DRIVE_FOLDER_URL} target="_blank" className="btn btn-light-custom fw-bold p-3 text-start"><i className="fas fa-folder-open me-2 text-primary"></i> Buka Folder Arsip PDF (Drive)</a>
-                                                    <button onClick={handleAdminLogout} className="btn btn-outline-danger fw-bold p-3"><i className="fas fa-sign-out-alt me-2"></i> Keluar (Logout)</button>
+                                                    <a href={SPREADSHEET_DIRECT_URL} target="_blank" className="btn btn-light-custom fw-bold p-3 text-start border-secondary"><i className="fas fa-file-excel me-2 text-success"></i> Buka Database Spreadsheet</a>
+                                                    
+                                                    {/* PERBAIKAN 4: TOMBOL SALIN LINK FOLDER */}
+                                                    <button onClick={copyFolderLink} className="btn btn-light-custom fw-bold p-3 text-start border-orange text-orange"><i className="fas fa-copy me-2"></i> Salin Link Folder PDF (Drive)</button>
+                                                    
+                                                    <button onClick={handleAdminLogout} className="btn btn-outline-danger fw-bold p-3 mt-2"><i className="fas fa-sign-out-alt me-2"></i> Keluar (Logout)</button>
                                                 </div>
                                             </div>
                                         )}
@@ -489,27 +514,32 @@
                         </div>
                     )}
 
-                    {/* MODAL EDIT */}
+                    {/* MODAL EDIT (FULL CRUD & HURUF BESAR OTOMATIS) */}
                     {editModal && (
-                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.4)'}} tabIndex="-1">
+                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.6)'}} tabIndex="-1">
                             <div className="modal-dialog modal-lg modal-dialog-centered">
-                                <div className="modal-content card-custom">
+                                <div className="modal-content card-custom border-orange">
                                     <div className="modal-header border-secondary border-opacity-50 pb-3">
-                                        <h5 className="modal-title fw-bold text-primary"><i className="fas fa-edit me-2"></i> Edit Data Admin</h5>
+                                        <h5 className="modal-title fw-bold text-orange"><i className="fas fa-edit me-2"></i> Edit Data Admin</h5>
                                     </div>
                                     <form onSubmit={handleUpdateSubmit}>
                                         <div className="modal-body py-3 row g-3">
-                                            <div className="col-md-6"><label className="form-label text-secondary small mb-1 fw-bold">Nama Siswa</label><input type="text" className="form-control" value={editModal.nama_siswa} onChange={e => setEditModal({...editModal, nama_siswa: e.target.value})} required/></div>
-                                            <div className="col-md-6"><label className="form-label text-secondary small mb-1 fw-bold">NISN</label><input type="text" className="form-control" value={editModal.nisn} onChange={e => setEditModal({...editModal, nisn: e.target.value})} /></div>
-                                            <div className="col-md-6"><label className="form-label text-secondary small mb-1 fw-bold">Nama Pengurus</label><input type="text" className="form-control" value={editModal.nama_pengurus} onChange={e => setEditModal({...editModal, nama_pengurus: e.target.value})} /></div>
-                                            <div className="col-md-6"><label className="form-label text-secondary small mb-1 fw-bold">Pendamping</label><input type="text" className="form-control" value={editModal.pendamping} onChange={e => setEditModal({...editModal, pendamping: e.target.value})} /></div>
-                                            <div className="col-md-8"><label className="form-label text-secondary small mb-1 fw-bold">Asal Sekolah</label><input type="text" className="form-control" value={editModal.sekolah} onChange={e => setEditModal({...editModal, sekolah: e.target.value})} /></div>
-                                            <div className="col-md-2"><label className="form-label text-secondary small mb-1 fw-bold">Bentuk</label><input type="text" className="form-control" value={editModal.bentuk} onChange={e => setEditModal({...editModal, bentuk: e.target.value})} /></div>
-                                            <div className="col-md-2"><label className="form-label text-secondary small mb-1 fw-bold">Tingkat</label><input type="text" className="form-control" value={editModal.tingkat} onChange={e => setEditModal({...editModal, tingkat: e.target.value})} /></div>
+                                            <div className="col-md-6"><label className="form-label text-light-gray small mb-1 fw-bold">Nama Siswa</label><input type="text" className="form-control" value={editModal.nama_siswa} onChange={e => setEditModal({...editModal, nama_siswa: e.target.value.toUpperCase()})} required/></div>
+                                            <div className="col-md-6"><label className="form-label text-light-gray small mb-1 fw-bold">NISN</label><input type="text" className="form-control" value={editModal.nisn} onChange={e => setEditModal({...editModal, nisn: e.target.value.toUpperCase()})} /></div>
+                                            <div className="col-md-6"><label className="form-label text-light-gray small mb-1 fw-bold">Nama Pengurus</label><input type="text" className="form-control" value={editModal.nama_pengurus} onChange={e => setEditModal({...editModal, nama_pengurus: e.target.value.toUpperCase()})} /></div>
+                                            <div className="col-md-6"><label className="form-label text-light-gray small mb-1 fw-bold">Pendamping</label><input type="text" className="form-control" value={editModal.pendamping} onChange={e => setEditModal({...editModal, pendamping: e.target.value.toUpperCase()})} /></div>
+                                            
+                                            {/* PERBAIKAN 3: INPUT SEKOLAH, BULAN, TAHUN UNTUK ADMIN */}
+                                            <div className="col-md-4"><label className="form-label text-light-gray small mb-1 fw-bold">Asal Sekolah</label><input type="text" className="form-control" value={editModal.sekolah} onChange={e => setEditModal({...editModal, sekolah: e.target.value.toUpperCase()})} /></div>
+                                            <div className="col-md-4"><label className="form-label text-light-gray small mb-1 fw-bold">Bulan</label><input type="text" className="form-control" value={editModal.bulan} onChange={e => setEditModal({...editModal, bulan: e.target.value.toUpperCase()})} /></div>
+                                            <div className="col-md-4"><label className="form-label text-light-gray small mb-1 fw-bold">Tahun</label><input type="text" className="form-control" value={editModal.tahun} onChange={e => setEditModal({...editModal, tahun: e.target.value.toUpperCase()})} /></div>
+                                            
+                                            <div className="col-md-6"><label className="form-label text-light-gray small mb-1 fw-bold">Bentuk</label><input type="text" className="form-control" value={editModal.bentuk} onChange={e => setEditModal({...editModal, bentuk: e.target.value.toUpperCase()})} /></div>
+                                            <div className="col-md-6"><label className="form-label text-light-gray small mb-1 fw-bold">Tingkat</label><input type="text" className="form-control" value={editModal.tingkat} onChange={e => setEditModal({...editModal, tingkat: e.target.value.toUpperCase()})} /></div>
                                         </div>
                                         <div className="modal-footer border-0 pt-0">
                                             <button type="button" className="btn btn-light-custom" onClick={() => setEditModal(null)}>Batal</button>
-                                            <button type="submit" className="btn btn-brand fw-bold">Simpan</button>
+                                            <button type="submit" className="btn btn-brand fw-bold">Simpan Perubahan</button>
                                         </div>
                                     </form>
                                 </div>
@@ -518,15 +548,15 @@
                     )}
 
                     {showSettings && (
-                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.4)'}} tabIndex="-1">
+                        <div className="modal d-block fade-in" style={{backgroundColor: 'rgba(0,0,0,0.6)'}} tabIndex="-1">
                             <div className="modal-dialog modal-dialog-centered">
-                                <div className="modal-content card-custom">
+                                <div className="modal-content card-custom border-orange">
                                     <div className="modal-header border-secondary border-opacity-50 pb-3">
-                                        <h5 className="modal-title fw-bold text-dark"><i className="fas fa-server text-primary me-2"></i> Setup API</h5>
+                                        <h5 className="modal-title fw-bold text-white"><i className="fas fa-server text-orange me-2"></i> Setup API</h5>
                                     </div>
                                     <div className="modal-body py-4">
-                                        <label className="form-label text-secondary fw-bold small">URL Google Apps Script</label>
-                                        <input type="text" className="form-control mb-3" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/..." />
+                                        <label className="form-label text-light-gray fw-bold small">URL Google Apps Script</label>
+                                        <input type="text" className="form-control bg-black text-white border-secondary mb-3" value={tempUrl} onChange={e => setTempUrl(e.target.value)} placeholder="https://script.google.com/..." />
                                         <div className="text-secondary small" style={{fontSize: '0.75rem'}}>Pastikan URL berakhiran dengan <strong>/exec</strong></div>
                                     </div>
                                     <div className="modal-footer border-0 pt-0">
@@ -540,13 +570,13 @@
 
                     <nav className="navbar navbar-expand-lg glass-header sticky-top py-2 py-md-3">
                         <div className="container-fluid px-3 px-lg-5">
-                            <a className="navbar-brand fw-black text-dark fs-5 fs-md-4 d-flex align-items-center gap-2" href="#" onClick={(e)=>{e.preventDefault(); changeTab('upload');}}>
-                                <div className="bg-primary text-white rounded p-2 d-flex align-items-center justify-content-center shadow-sm" style={{width:'32px', height:'32px'}}><i className="fas fa-check-double fs-6"></i></div>
-                                <span className="text-dark fs-6 d-none d-sm-block fw-bold">VERIF DIGITAL <span className="text-primary">SDM PKH TAPIN</span></span>
-                                <span className="text-dark fs-6 d-block d-sm-none fw-bold">VERIF <span className="text-primary">SDM PKH</span></span>
+                            <a className="navbar-brand fw-black text-white fs-5 fs-md-4 d-flex align-items-center gap-2" href="#" onClick={(e)=>{e.preventDefault(); changeTab('upload');}}>
+                                <div className="bg-orange text-dark rounded p-2 d-flex align-items-center justify-content-center shadow-sm" style={{width:'32px', height:'32px'}}><i className="fas fa-check-double fs-6"></i></div>
+                                <span className="text-white fs-6 d-none d-sm-block fw-bold">VERIF DIGITAL <span className="text-orange">SDM PKH TAPIN</span></span>
+                                <span className="text-white fs-6 d-block d-sm-none fw-bold">VERIF <span className="text-orange">SDM PKH</span></span>
                             </a>
                             
-                            <button className="navbar-toggler border-0 text-dark p-1" type="button" onClick={() => setIsNavOpen(!isNavOpen)}><i className="fas fa-bars fs-4 text-primary"></i></button>
+                            <button className="navbar-toggler border-0 text-white p-1" type="button" onClick={() => setIsNavOpen(!isNavOpen)}><i className="fas fa-bars fs-4 text-orange"></i></button>
 
                             <div className={`mobile-menu-collapse ${isNavOpen ? 'show' : ''} justify-content-end w-100 flex-lg-grow-1 d-lg-flex`}>
                                 <ul className="nav nav-pills mt-3 mt-lg-0 gap-2 d-flex flex-column flex-lg-row align-items-lg-center w-100 justify-content-lg-end">
@@ -557,7 +587,7 @@
                                     <li className="nav-item"><button onClick={() => changeTab('dashboard_arsip')} className={`nav-link w-100 text-start ${activeTab === 'dashboard_arsip' ? 'active' : ''}`}><i className="fas fa-folder-open me-2"></i> Arsip</button></li>
                                     <li className="nav-item"><button onClick={() => changeTab('arsip_pdf')} className={`nav-link w-100 text-start ${activeTab === 'arsip_pdf' ? 'active' : ''}`}><i className="fas fa-file-pdf me-2"></i> PDF</button></li>
                                     <li className="nav-item ms-lg-3 border-start border-secondary border-opacity-50 ps-lg-3 mt-2 mt-lg-0">
-                                        <button onClick={() => { setIsNavOpen(false); setShowAdminModal(true); }} className={`btn btn-sm w-100 fw-bold ${isAdmin ? 'btn-primary text-white' : 'btn-outline-primary rounded-pill'}`}><i className={`fas ${isAdmin ? 'fa-unlock' : 'fa-lock'} me-2`}></i> {isAdmin ? 'Admin Menu' : 'Admin'}</button>
+                                        <button onClick={() => { setIsNavOpen(false); setShowAdminModal(true); }} className={`btn btn-sm w-100 fw-bold ${isAdmin ? 'bg-orange text-dark' : 'btn-outline-warning text-orange rounded-pill border-orange'}`}><i className={`fas ${isAdmin ? 'fa-unlock' : 'fa-lock'} me-2`}></i> {isAdmin ? 'Admin Menu' : 'Admin'}</button>
                                     </li>
                                     <li className="nav-item mt-2 mt-lg-0 ms-lg-2">
                                         <button onClick={() => setShowSettings(true)} className="btn btn-sm text-secondary w-100 text-start"><i className="fas fa-cog"></i></button>
@@ -574,13 +604,13 @@
                                 <div className="col-12 col-lg-8 col-xl-7">
                                     {uploadState === 'idle' && (
                                         <div className="card-custom p-4 p-md-5 text-center">
-                                            <div className="mx-auto bg-light-blue text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 border border-primary border-opacity-50 shadow-sm" style={{width:'75px', height:'75px'}}><i className="fas fa-file-invoice fs-2"></i></div>
-                                            <h2 className="fw-bold text-dark mb-3">Multi-File AI Scanner</h2>
+                                            <div className="mx-auto bg-orange-dark text-orange rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style={{width:'75px', height:'75px'}}><i className="fas fa-file-invoice fs-2"></i></div>
+                                            <h2 className="fw-bold text-white mb-3">Multi-File AI Scanner</h2>
                                             
-                                            <div className="alert bg-light-blue small fw-bold text-start mb-4 rounded-3 p-3 border-primary border-opacity-25">
-                                                <i className="fas fa-exclamation-triangle text-primary me-2 mb-2 fs-6"></i> <span className="text-uppercase text-primary">Aturan Foto Maksimal:</span><br/>
-                                                <ul className="mb-0 mt-1 ps-3 text-dark" style={{lineHeight: '1.6'}}>
-                                                    <li>Posisi kamera <strong className="text-primary">WAJIB MENDATAR (LANDSCAPE)</strong>.</li>
+                                            <div className="alert bg-orange-dark small fw-bold text-start mb-4 rounded-3 p-3">
+                                                <i className="fas fa-exclamation-triangle text-orange me-2 mb-2 fs-6"></i> <span className="text-uppercase text-orange">Aturan Foto Maksimal:</span><br/>
+                                                <ul className="mb-0 mt-1 ps-3 text-light-gray" style={{lineHeight: '1.6'}}>
+                                                    <li>Posisi kamera <strong className="text-orange">WAJIB MENDATAR (LANDSCAPE)</strong>.</li>
                                                     <li>Jika terpaksa berdiri, sistem akan otomatis merotasinya.</li>
                                                     <li>Hasil akhir otomatis menjadi F4 Landscape.</li>
                                                 </ul>
@@ -593,18 +623,18 @@
 
                                     {uploadState === 'staged' && (
                                         <div className="card-custom p-4 p-md-5 text-center fade-in">
-                                            <div className="mx-auto bg-light-blue text-primary rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style={{width:'75px', height:'75px'}}><i className="fas fa-layer-group fs-2"></i></div>
-                                            <h3 className="fw-bold text-dark mb-2">Dokumen Siap</h3>
-                                            <p className="text-secondary mb-3 small fw-bold">
+                                            <div className="mx-auto bg-orange-dark text-orange rounded-circle d-flex align-items-center justify-content-center mb-4 shadow-sm" style={{width:'75px', height:'75px'}}><i className="fas fa-layer-group fs-2"></i></div>
+                                            <h3 className="fw-bold text-white mb-2">Dokumen Siap</h3>
+                                            <p className="text-light-gray mb-3 small fw-bold">
                                                 {stagedFiles.length} Halaman / File ditambahkan.<br/>
-                                                <span className="text-primary mt-2 d-inline-block bg-light-blue p-2 rounded border border-primary border-opacity-25">Info: Jika dokumen 1 halaman, langsung klik "Mulai Ekstrak AI". Jika lebih, klik "Tambah Halaman Lain".</span>
+                                                <span className="text-orange mt-2 d-inline-block bg-orange-dark p-2 rounded border-orange">Info: Jika dokumen 1 halaman, langsung klik "Mulai Ekstrak AI". Jika lebih, klik "Tambah Halaman Lain".</span>
                                             </p>
                                             
                                             <input type="file" multiple accept="image/*,.pdf" className="d-none" ref={fileInputRef} onChange={handleFileChange} />
                                             
                                             <div className="d-flex flex-column gap-3 mt-4">
                                                 <button onClick={() => { setProcessedFiles(stagedFiles); extractTextFromFiles(stagedFiles); }} className="btn btn-brand py-3 shadow-sm w-100 fs-6"><i className="fas fa-magic me-2"></i> Mulai Ekstrak AI</button>
-                                                <button onClick={() => fileInputRef.current.click()} className="btn btn-light-custom py-3 fw-bold w-100 border-primary text-primary"><i className="fas fa-plus me-2"></i> Tambah Halaman Lain (Jika Ada)</button>
+                                                <button onClick={() => fileInputRef.current.click()} className="btn btn-light-custom py-3 fw-bold w-100 text-orange border-orange"><i className="fas fa-plus me-2"></i> Tambah Halaman Lain (Jika Ada)</button>
                                             </div>
                                             <div className="mt-4">
                                                 <button onClick={resetForm} className="btn btn-link text-danger text-decoration-none small fw-bold"><i className="fas fa-times me-1"></i> Batalkan Semua</button>
@@ -614,31 +644,31 @@
 
                                     {(uploadState === 'processing_image' || uploadState === 'extracting' || uploadState === 'saving') && (
                                         <div className="card-custom p-4 p-md-5 text-center">
-                                            <div className="spinner-border text-primary mb-4" role="status"></div>
-                                            <h4 className="fw-bold text-dark mb-2">{uploadState === 'processing_image' ? `Memproses Dokumen & Mengompres...` : uploadState === 'extracting' ? 'AI Menyisir Baris Tabel Secara Utuh...' : 'Menyimpan Data...'}</h4>
+                                            <div className="spinner-border text-orange mb-4" role="status"></div>
+                                            <h4 className="fw-bold text-white mb-2">{uploadState === 'processing_image' ? `Memproses & Mengompres...` : uploadState === 'extracting' ? 'AI Menyisir Baris Tabel Secara Utuh...' : 'Menyimpan Data...'}</h4>
                                         </div>
                                     )}
 
                                     {uploadState === 'form' && (
                                         <div className="card-custom overflow-hidden fade-in">
-                                            <div className="bg-light p-3 p-md-4 border-bottom border-secondary border-opacity-50 d-flex justify-content-between align-items-center">
-                                                <h5 className="text-dark fw-bold m-0"><i className="fas fa-check-double text-primary me-2"></i> Verifikasi Data AI</h5>
-                                                <span className="badge bg-primary text-white py-2 px-3 rounded-pill">{(extractedData.siswa || []).length} Baris Terbaca</span>
+                                            <div className="bg-black p-3 p-md-4 border-bottom border-orange border-opacity-50 d-flex justify-content-between align-items-center">
+                                                <h5 className="text-white fw-bold m-0"><i className="fas fa-check-double text-orange me-2"></i> Verifikasi Data AI</h5>
+                                                <span className="badge bg-orange text-dark py-2 px-3 rounded-pill fw-bold">{(extractedData.siswa || []).length} Baris Terbaca</span>
                                             </div>
                                             <form onSubmit={handleSave} className="p-3 p-md-4">
-                                                <div className="row g-3 bg-white p-3 rounded-4 border border-secondary border-opacity-50 mb-4 shadow-sm">
-                                                    <div className="col-12 col-md-6"><label className="form-label text-secondary fw-bold small text-uppercase mb-1">Sekolah (Global)</label><div className="form-control bg-light text-dark fw-bold border-0">{extractedData.sekolah || '-'}</div></div>
-                                                    <div className="col-12 col-md-6"><label className="form-label text-secondary fw-bold small text-uppercase mb-1">Periode Global</label><div className="form-control bg-light text-dark fw-bold border-0">{extractedData.bulan} {extractedData.tahun}</div></div>
+                                                <div className="row g-3 bg-black p-3 rounded-4 border border-secondary border-opacity-50 mb-4 shadow-sm">
+                                                    <div className="col-12 col-md-6"><label className="form-label text-light-gray fw-bold small text-uppercase mb-1">Sekolah (Global)</label><div className="form-control bg-dark text-white fw-bold border-secondary">{extractedData.sekolah || '-'}</div></div>
+                                                    <div className="col-12 col-md-6"><label className="form-label text-light-gray fw-bold small text-uppercase mb-1">Periode Global</label><div className="form-control bg-dark text-white fw-bold border-secondary">{extractedData.bulan} {extractedData.tahun}</div></div>
                                                 </div>
-                                                <h6 className="text-primary fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Tabel Data Siswa</h6>
+                                                <h6 className="text-orange fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Tabel Data Siswa (Otomatis Kapital)</h6>
                                                 <div className="overflow-auto custom-scrollbar pe-2 mb-4" style={{maxHeight: '350px'}}>
                                                     {(extractedData.siswa || []).map((s, i) => (
-                                                        <div className="bg-white p-3 rounded-4 border border-secondary border-opacity-50 mb-2 shadow-sm" key={i}>
+                                                        <div className="bg-black p-3 rounded-4 border border-secondary border-opacity-50 mb-2 shadow-sm" key={i}>
                                                             <div className="row align-items-center g-2">
-                                                                <div className="col-12 col-lg-7"><div className="d-flex align-items-start gap-2"><span className="badge bg-primary text-white rounded-pill py-1 px-2 mt-1">{i+1}</span><div><div className="text-dark fw-bold small">{s.nama_siswa}</div><div className="text-secondary" style={{fontSize:'0.7rem'}}>NISN: <span className="text-dark fw-bold">{s.nisn}</span> | NIK: <span className="text-dark fw-bold">{s.nik_siswa}</span></div><div className="badge bg-light-blue text-primary px-2 py-1 mt-2 fw-bold" style={{fontSize: '0.75rem'}}><i className="fas fa-user-tie me-1"></i> PENDAMPING: {s.pendamping || '-'}</div></div></div></div>
+                                                                <div className="col-12 col-lg-7"><div className="d-flex align-items-start gap-2"><span className="badge bg-orange text-dark rounded-pill py-1 px-2 mt-1 fw-bold">{i+1}</span><div><div className="text-white fw-bold small">{s.nama_siswa}</div><div className="text-light-gray" style={{fontSize:'0.7rem'}}>NISN: <span className="text-white fw-bold">{s.nisn}</span> | NIK: <span className="text-white fw-bold">{s.nik_siswa}</span></div><div className="badge bg-orange-dark text-orange border border-orange px-2 py-1 mt-2 fw-bold" style={{fontSize: '0.75rem'}}><i className="fas fa-user-tie me-1"></i> PENDAMPING: {s.pendamping || '-'}</div></div></div></div>
                                                                 <div className="col-12 col-lg-5 text-start text-lg-end">
-                                                                    <div className="badge bg-secondary text-white px-2 py-1 rounded-pill text-wrap lh-base" style={{fontSize:'0.65rem'}}>{s.bentuk} &bull; {s.tingkat} &bull; <span className="text-white">{s.bulan} {s.tahun}</span></div>
-                                                                    <br/><div className="text-secondary bg-light px-2 py-1 rounded border border-secondary border-opacity-50 d-inline-block mt-2 mt-lg-0" style={{fontSize:'0.65rem'}}>Wali: <strong className="text-dark">{s.nama_pengurus}</strong></div>
+                                                                    <div className="badge bg-secondary text-white px-2 py-1 rounded-pill text-wrap lh-base" style={{fontSize:'0.65rem'}}>{s.bentuk} &bull; {s.tingkat} &bull; <span className="text-orange">{s.bulan} {s.tahun}</span></div>
+                                                                    <br/><div className="text-light-gray bg-dark px-2 py-1 rounded border border-secondary border-opacity-50 d-inline-block mt-2 mt-lg-0" style={{fontSize:'0.65rem'}}>Wali: <strong className="text-white">{s.nama_pengurus}</strong></div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -654,10 +684,10 @@
                                     )}
 
                                     {uploadState === 'success' && (
-                                        <div className="card-custom p-4 p-md-5 text-center border-top border-primary border-4 fade-in shadow-sm">
-                                            <i className="fas fa-check-circle text-primary mx-auto mb-3" style={{fontSize: '4rem'}}></i>
-                                            <h3 className="text-dark fw-bold mb-2">Berhasil!</h3>
-                                            <p className="text-secondary mb-4 small fw-bold">Data diverifikasi. PDF disimpan (Full Color, Landscape). Cek notifikasi.</p>
+                                        <div className="card-custom p-4 p-md-5 text-center border-top border-orange border-4 fade-in shadow-sm">
+                                            <i className="fas fa-check-circle text-orange mx-auto mb-3" style={{fontSize: '4rem'}}></i>
+                                            <h3 className="text-white fw-bold mb-2">Berhasil!</h3>
+                                            <p className="text-light-gray mb-4 small fw-bold">Data diverifikasi. PDF disimpan (Full Color, F4 Landscape). Cek notifikasi.</p>
                                             <div className="d-flex flex-column flex-sm-row justify-content-center gap-2">
                                                 <button onClick={resetForm} className="btn btn-light-custom px-4">Upload Lain</button>
                                                 <button onClick={() => setActiveTab('komponen_unik')} className="btn btn-brand px-4">Lihat Data</button>
@@ -674,7 +704,7 @@
                                 return (
                                     <div className="card-custom p-3 p-md-4 mb-4 fade-in shadow-sm border-0">
                                         <div className="row g-2">
-                                            <div className="col-12 col-md-3"><div className="input-group"><span className="input-group-text bg-white border-secondary text-primary"><i className="fas fa-search"></i></span><input type="text" className="form-control border-start-0 ps-0" placeholder="Cari nama, NISN..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} /></div></div>
+                                            <div className="col-12 col-md-3"><div className="input-group"><span className="input-group-text bg-black border-secondary text-orange"><i className="fas fa-search"></i></span><input type="text" className="form-control border-start-0 ps-0" placeholder="Cari nama, NISN..." value={searchQuery} onChange={e=>setSearchQuery(e.target.value)} /></div></div>
                                             <div className="col-12 col-md-3"><select className="form-select" value={filterPendamping} onChange={e=>setFilterPendamping(e.target.value)}><option value="">Semua Pendamping</option>{optionsPendamping.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}</select></div>
                                             <div className="col-12 col-md-3"><select className="form-select" value={filterBentuk} onChange={e=>setFilterBentuk(e.target.value)}><option value="">Semua Jenjang</option>{optionsBentuk.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}</select></div>
                                             <div className="col-12 col-md-3"><select className="form-select" value={filterTingkat} onChange={e=>setFilterTingkat(e.target.value)}><option value="">Semua Kelas</option>{optionsTingkat.map((opt, i) => <option key={i} value={opt}>{opt}</option>)}</select></div>
@@ -689,23 +719,23 @@
                         {activeTab === 'dashboard_komponen' && (
                             <div className="fade-in">
                                 <div className="d-flex align-items-center gap-3 mb-3 border-bottom border-secondary border-opacity-50 pb-2">
-                                    <div className="bg-primary text-white p-2 rounded-3 shadow-sm"><i className="fas fa-chart-bar fs-5"></i></div>
-                                    <div><h4 className="text-dark fw-bold m-0">Statistik Data</h4></div>
+                                    <div className="bg-orange text-dark p-2 rounded-3 shadow-sm"><i className="fas fa-chart-bar fs-5"></i></div>
+                                    <div><h4 className="text-white fw-bold m-0">Statistik Data</h4></div>
                                 </div>
                                 <div className="row g-3">
                                     <div className="col-12 col-lg-4 d-flex flex-column gap-3">
                                         <div className="card card-stats p-4 rounded-4 shadow h-100 justify-content-center position-relative overflow-hidden">
-                                            <div className="text-white-50 fw-bold text-uppercase mb-1 small position-relative" style={{zIndex: 2}}>Total Seluruh Data</div>
+                                            <div className="text-light-gray fw-bold text-uppercase mb-1 small position-relative" style={{zIndex: 2}}>Total Seluruh Data</div>
                                             <div className="fs-1 fw-bold text-white position-relative" style={{zIndex: 2}}>{filteredKomponen.length}</div>
-                                            <i className="fas fa-users position-absolute text-white" style={{fontSize:'6rem', right:'-10px', bottom:'-10px', opacity: 0.15, zIndex: 1}}></i>
+                                            <i className="fas fa-users position-absolute text-orange" style={{fontSize:'6rem', right:'-10px', bottom:'-10px', opacity: 0.15, zIndex: 1}}></i>
                                         </div>
                                         <div className="card card-custom p-3 p-md-4 rounded-4 shadow-sm h-100 border-0">
-                                            <h6 className="text-primary fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Top Surveyor</h6>
+                                            <h6 className="text-orange fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Top Surveyor</h6>
                                             <div className="overflow-auto custom-scrollbar pe-2" style={{maxHeight:'200px'}}>
                                                 {Object.entries(aggregatePendamping).sort((a,b)=>b[1]-a[1]).map(([k,v], i) => (
-                                                    <div key={k} className="d-flex justify-content-between align-items-center bg-light p-2 rounded-3 mb-2 border border-secondary border-opacity-50 small">
-                                                        <span className="text-dark text-truncate me-2 fw-bold"><span className="text-primary me-1">{i+1}.</span>{k}</span>
-                                                        <span className="badge bg-primary text-white rounded-pill">{v}</span>
+                                                    <div key={k} className="d-flex justify-content-between align-items-center bg-black p-2 rounded-3 mb-2 border border-secondary border-opacity-50 small">
+                                                        <span className="text-white text-truncate me-2 fw-bold"><span className="text-orange me-1">{i+1}.</span>{k}</span>
+                                                        <span className="badge bg-orange text-dark rounded-pill fw-bold">{v}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -713,19 +743,19 @@
                                     </div>
                                     <div className="col-12 col-lg-8">
                                         <div className="card card-custom p-3 p-md-4 rounded-4 shadow-sm h-100 border-0">
-                                            <h6 className="text-primary fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Distribusi Jenjang & Kelas</h6>
+                                            <h6 className="text-orange fw-bold mb-3 border-bottom border-secondary border-opacity-50 pb-2">Distribusi Jenjang & Kelas</h6>
                                             <div className="row g-3">
                                                 {Object.entries(aggregateBentukTingkat).map(([bentuk, data]) => (
                                                     <div key={bentuk} className="col-12 col-md-6">
-                                                        <div className="bg-light p-3 rounded-4 border border-secondary border-opacity-50 h-100 shadow-sm">
+                                                        <div className="bg-black p-3 rounded-4 border border-secondary border-opacity-50 h-100 shadow-sm">
                                                             <div className="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary border-opacity-50 pb-2">
-                                                                <h5 className="text-primary fw-bold m-0">{bentuk}</h5>
+                                                                <h5 className="text-orange fw-bold m-0">{bentuk}</h5>
                                                                 <span className="badge bg-secondary text-white border border-secondary small">{Object.values(data).reduce((a,b)=>a+b,0)}</span>
                                                             </div>
                                                             {Object.entries(data).map(([t, c]) => (
-                                                                <div key={t} className="d-flex justify-content-between align-items-center bg-white px-2 py-1 rounded-3 mb-1 small shadow-sm border border-secondary border-opacity-25">
-                                                                    <span className="text-secondary fw-bold">{t}</span>
-                                                                    <span className="text-primary fw-bold bg-light px-2 rounded border border-secondary border-opacity-50">{c}</span>
+                                                                <div key={t} className="d-flex justify-content-between align-items-center bg-dark px-2 py-1 rounded-3 mb-1 small shadow-sm border border-secondary border-opacity-25">
+                                                                    <span className="text-light-gray fw-bold">{t}</span>
+                                                                    <span className="text-orange fw-bold bg-black px-2 rounded border border-secondary border-opacity-50">{c}</span>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -743,15 +773,15 @@
                             <div className="fade-in d-flex flex-column" style={{height:'75vh'}}>
                                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3 border-bottom border-secondary border-opacity-50 pb-2">
                                     <div className="d-flex align-items-center gap-2">
-                                        <div className="bg-primary text-white p-2 rounded-3 shadow-sm"><i className="fas fa-users fs-5"></i></div>
+                                        <div className="bg-orange text-dark p-2 rounded-3 shadow-sm"><i className="fas fa-users fs-5"></i></div>
                                         <div>
-                                            <h5 className="text-dark fw-bold m-0">Data Komponen</h5>
-                                            <div className="text-primary fw-bold mt-1" style={{fontSize: '0.65rem'}}>1 Siswa = 1 Baris (Blokir Ganda Aktif)</div>
+                                            <h5 className="text-white fw-bold m-0">Data Komponen</h5>
+                                            <div className="text-orange fw-bold mt-1" style={{fontSize: '0.65rem'}}>1 Siswa = 1 Baris (Blokir Ganda Mutlak)</div>
                                         </div>
                                     </div>
                                     <div className="d-flex gap-2">
-                                        <button onClick={exportToExcelUnik} className="btn btn-sm btn-outline-success fw-bold bg-white"><i className="fas fa-file-excel"></i> Excel</button>
-                                        <button onClick={exportToPDFUnik} className="btn btn-sm btn-outline-danger fw-bold bg-white"><i className="fas fa-file-pdf"></i> PDF</button>
+                                        <button onClick={exportToExcelUnik} className="btn btn-sm btn-outline-success fw-bold bg-dark text-white"><i className="fas fa-file-excel"></i> Excel</button>
+                                        <button onClick={exportToPDFUnik} className="btn btn-sm btn-outline-danger fw-bold bg-dark text-white"><i className="fas fa-file-pdf"></i> PDF</button>
                                     </div>
                                 </div>
 
@@ -760,26 +790,26 @@
                                         <table className="table table-hover mb-0">
                                             <thead className="sticky-top" style={{zIndex:10}}>
                                                 <tr>
-                                                    <th className="p-2 p-md-3">Identitas Siswa</th>
-                                                    <th className="p-2 p-md-3">Pendidikan</th>
-                                                    <th className="p-2 p-md-3">Sekolah</th>
-                                                    <th className="p-2 p-md-3">P. Jawab</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Identitas Siswa</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Pendidikan</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Sekolah</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">P. Jawab</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {loadingData ? <tr><td colSpan="4" className="text-center py-5"><div className="spinner-border text-primary"></div></td></tr> :
+                                                {loadingData ? <tr><td colSpan="4" className="text-center py-5"><div className="spinner-border text-orange"></div></td></tr> :
                                                  filteredUnique.length===0 ? <tr><td colSpan="4" className="text-center text-secondary py-5 small fw-bold">Tidak ada data.</td></tr> :
                                                  filteredUnique.map((r,i) => (
                                                     <tr key={i}>
                                                         <td className="p-2 p-md-3">
-                                                            <div className="fw-bold text-dark" style={{fontSize: '0.85rem'}}>{r.nama_siswa}</div>
-                                                            <div className="text-secondary mt-1" style={{fontSize: '0.65rem'}}>NISN: <span className="text-dark fw-bold">{r.nisn}</span> | NIK: <span className="text-dark fw-bold">{r.nik_siswa}</span></div>
+                                                            <div className="fw-bold text-white" style={{fontSize: '0.8rem'}}>{r.nama_siswa}</div>
+                                                            <div className="text-light-gray mt-1" style={{fontSize: '0.65rem'}}>NISN: <span className="text-white fw-bold">{r.nisn}</span> | NIK: <span className="text-white fw-bold">{r.nik_siswa}</span></div>
                                                         </td>
                                                         <td className="p-2 p-md-3"><span className="badge bg-secondary text-white px-2 py-1" style={{fontSize: '0.65rem'}}>{r.bentuk} &bull; {r.tingkat}</span></td>
-                                                        <td className="p-2 p-md-3"><div className="text-dark fw-bold" style={{fontSize: '0.75rem'}}>{r.sekolah}</div></td>
+                                                        <td className="p-2 p-md-3"><div className="text-white fw-bold" style={{fontSize: '0.75rem'}}>{r.sekolah}</div></td>
                                                         <td className="p-2 p-md-3">
-                                                            <div className="text-secondary mb-1 fw-bold" style={{fontSize: '0.65rem'}}><i className="fas fa-user-tie me-1"></i> Wali: {r.nama_pengurus}</div>
-                                                            <div className="badge bg-light-blue text-primary px-2 py-1 fw-bold" style={{fontSize: '0.7rem'}}><i className="fas fa-user-tie me-1"></i> {r.pendamping || '-'}</div>
+                                                            <div className="text-light-gray mb-1 fw-bold" style={{fontSize: '0.65rem'}}><i className="fas fa-user-tie me-1"></i> Wali: {r.nama_pengurus}</div>
+                                                            <div className="badge bg-orange-dark text-orange border border-orange px-2 py-1 fw-bold" style={{fontSize: '0.7rem'}}><i className="fas fa-user-tie me-1"></i> {r.pendamping || '-'}</div>
                                                         </td>
                                                     </tr>
                                                  ))
@@ -787,8 +817,8 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="bg-light p-2 p-md-3 border-top border-secondary border-opacity-50 d-flex justify-content-between text-secondary fw-bold" style={{fontSize:'0.7rem'}}>
-                                        <span className="text-primary">Total Unik: {filteredUnique.length} Siswa</span>
+                                    <div className="bg-black p-2 p-md-3 border-top border-secondary border-opacity-50 d-flex justify-content-between text-light-gray fw-bold" style={{fontSize:'0.7rem'}}>
+                                        <span className="text-orange">Total Unik: {filteredUnique.length} Siswa</span>
                                         <span>Data Bersih</span>
                                     </div>
                                 </div>
@@ -802,13 +832,13 @@
                                     <div className="d-flex align-items-center gap-2">
                                         <div className="bg-success text-white p-2 rounded-3 shadow-sm"><i className="fas fa-database fs-5"></i></div>
                                         <div>
-                                            <h5 className="text-dark fw-bold m-0">Live Database</h5>
+                                            <h5 className="text-white fw-bold m-0">Live Database</h5>
                                             <div className="text-success fw-bold mt-1" style={{fontSize: '0.65rem'}}>Data Keseluruhan</div>
                                         </div>
                                     </div>
                                     <div className="d-flex flex-wrap gap-2">
-                                        <button onClick={exportToExcelDatabase} className="btn btn-sm btn-outline-success fw-bold bg-white"><i className="fas fa-file-excel"></i> Excel</button>
-                                        <button onClick={exportToPDFDatabase} className="btn btn-sm btn-outline-danger fw-bold bg-white"><i className="fas fa-file-pdf"></i> PDF</button>
+                                        <button onClick={exportToExcelDatabase} className="btn btn-sm btn-outline-success fw-bold bg-dark text-white"><i className="fas fa-file-excel"></i> Excel</button>
+                                        <button onClick={exportToPDFDatabase} className="btn btn-sm btn-outline-danger fw-bold bg-dark text-white"><i className="fas fa-file-pdf"></i> PDF</button>
                                         {isAdmin && <button onClick={handleResetAll} className="btn btn-sm btn-danger fw-bold text-white"><i className="fas fa-trash-alt"></i> Reset</button>}
                                     </div>
                                 </div>
@@ -818,11 +848,11 @@
                                         <table className="table table-hover mb-0">
                                             <thead className="sticky-top" style={{zIndex:10}}>
                                                 <tr>
-                                                    <th className="p-2 p-md-3">Siswa (NISN)</th>
-                                                    <th className="p-2 p-md-3">Kelas</th>
-                                                    <th className="p-2 p-md-3">Sekolah</th>
-                                                    <th className="p-2 p-md-3">Berkas</th>
-                                                    {isAdmin && <th className="p-2 p-md-3 text-primary"><i className="fas fa-crown me-1"></i> Admin</th>}
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Siswa (NISN)</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Kelas</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Sekolah</th>
+                                                    <th className="p-2 p-md-3 text-orange bg-black">Berkas</th>
+                                                    {isAdmin && <th className="p-2 p-md-3 text-white bg-black"><i className="fas fa-crown text-orange me-1"></i> Admin</th>}
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -830,21 +860,21 @@
                                                  filteredKomponen.length===0 ? <tr><td colSpan={isAdmin ? "5" : "4"} className="text-center text-secondary py-5 small fw-bold">Kosong</td></tr> :
                                                  filteredKomponen.map((r,i) => (
                                                     <tr key={i}>
-                                                        <td className="p-2 p-md-3"><div className="fw-bold text-dark" style={{fontSize:'0.85rem'}}>{r.nama_siswa}</div><div className="text-secondary mt-1" style={{fontSize:'0.65rem'}}><span className="bg-light px-2 py-1 rounded border border-secondary border-opacity-50 text-dark fw-bold">NISN: {r.nisn}</span></div></td>
+                                                        <td className="p-2 p-md-3"><div className="fw-bold text-white" style={{fontSize:'0.85rem'}}>{r.nama_siswa}</div><div className="text-light-gray mt-1" style={{fontSize:'0.65rem'}}><span className="bg-dark px-2 py-1 rounded border border-secondary border-opacity-50 text-white fw-bold">NISN: {r.nisn}</span></div></td>
                                                         <td className="p-2 p-md-3"><span className="badge bg-secondary text-white px-2 py-1 border border-secondary border-opacity-50" style={{fontSize:'0.65rem'}}>{r.bentuk} &bull; {r.tingkat}</span></td>
                                                         <td className="p-2 p-md-3">
-                                                            <div className="text-dark fw-bold mb-1" style={{fontSize:'0.75rem'}}>{r.sekolah} <span className="text-secondary fw-normal">({r.bulan} {r.tahun})</span></div>
-                                                            <div className="text-secondary fw-bold" style={{fontSize:'0.65rem'}}><i className="fas fa-user-tie me-1"></i> {r.nama_pengurus}</div>
+                                                            <div className="text-white fw-bold mb-1" style={{fontSize:'0.75rem'}}>{r.sekolah} <span className="text-secondary fw-normal">({r.bulan} {r.tahun})</span></div>
+                                                            <div className="text-light-gray fw-bold" style={{fontSize:'0.65rem'}}><i className="fas fa-user-tie me-1"></i> {r.nama_pengurus}</div>
                                                         </td>
                                                         <td className="p-2 p-md-3">
-                                                            <div className="badge bg-light-blue text-primary px-2 py-1 d-inline-block mb-2 text-truncate fw-bold" style={{maxWidth:'150px', fontSize:'0.7rem'}}><i className="fas fa-user-tie me-1"></i> {r.pendamping || '-'}</div><br/>
-                                                            {r.url!=='#' ? <a href={r.url} target="_blank" className="btn btn-sm btn-outline-danger fw-bold py-0 px-2" style={{fontSize:'0.65rem'}}><i className="fas fa-file-pdf"></i> Buka</a> : <span className="badge bg-light text-secondary border border-secondary" style={{fontSize:'0.65rem'}}>No File</span>}
+                                                            <div className="badge bg-orange-dark text-orange border border-orange px-2 py-1 d-inline-block mb-2 text-truncate fw-bold" style={{maxWidth:'150px', fontSize:'0.7rem'}}><i className="fas fa-user-tie me-1"></i> {r.pendamping || '-'}</div><br/>
+                                                            {r.url!=='#' ? <a href={r.url} target="_blank" className="btn btn-sm btn-outline-danger fw-bold py-0 px-2 bg-dark text-white border-danger" style={{fontSize:'0.65rem'}}><i className="fas fa-file-pdf"></i> Buka</a> : <span className="badge bg-dark text-secondary border border-secondary" style={{fontSize:'0.65rem'}}>No File</span>}
                                                         </td>
                                                         {isAdmin && (
                                                             <td className="p-2 p-md-3">
                                                                 <div className="d-flex gap-1">
-                                                                    <button onClick={() => setEditModal(r)} className="btn btn-sm btn-outline-primary py-0 px-1 bg-white"><i className="fas fa-edit"></i></button>
-                                                                    <button onClick={() => handleDelete(r.timestamp)} className="btn btn-sm btn-outline-danger py-0 px-1 bg-white"><i className="fas fa-trash-alt"></i></button>
+                                                                    <button onClick={() => setEditModal(r)} className="btn btn-sm btn-outline-warning py-0 px-1 bg-dark"><i className="fas fa-edit"></i></button>
+                                                                    <button onClick={() => handleDelete(r.timestamp)} className="btn btn-sm btn-outline-danger py-0 px-1 bg-dark"><i className="fas fa-trash-alt"></i></button>
                                                                 </div>
                                                             </td>
                                                         )}
@@ -854,8 +884,8 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className="bg-light p-2 p-md-3 border-top border-secondary border-opacity-50 d-flex justify-content-between text-secondary fw-bold" style={{fontSize:'0.7rem'}}>
-                                        <span>Total: {filteredKomponen.length} Data {isAdmin && <span className="text-primary ms-1">(Admin)</span>}</span>
+                                    <div className="bg-black p-2 p-md-3 border-top border-secondary border-opacity-50 d-flex justify-content-between text-light-gray fw-bold" style={{fontSize:'0.7rem'}}>
+                                        <span>Total: {filteredKomponen.length} Data {isAdmin && <span className="text-orange ms-1">(Admin)</span>}</span>
                                         <span>Synced <i className="fas fa-cloud text-success"></i></span>
                                     </div>
                                 </div>
@@ -867,28 +897,28 @@
                             <div className="fade-in">
                                 <div className="d-flex align-items-center gap-3 mb-3 border-bottom border-secondary border-opacity-50 pb-2">
                                     <div className="bg-danger text-white p-2 rounded-3 shadow-sm"><i className="fas fa-folder-open fs-5"></i></div>
-                                    <h4 className="text-dark fw-bold m-0">Dashboard Arsip</h4>
+                                    <h4 className="text-white fw-bold m-0">Dashboard Arsip</h4>
                                 </div>
                                 <div className="row g-3">
                                     <div className="col-12 col-md-4">
                                         <div className="card-custom p-4 p-lg-5 rounded-4 shadow-sm text-center border-top border-danger border-4">
                                             <i className="fas fa-file-pdf text-danger fs-2 mb-2"></i>
                                             <div className="text-secondary fw-bold text-uppercase mb-1 small">Total Dokumen PDF</div>
-                                            <div className="fs-1 fw-bold text-dark">{arsipUnik.length}</div>
+                                            <div className="fs-1 fw-bold text-white">{arsipUnik.length}</div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-md-4">
-                                        <div className="card-custom p-4 p-lg-5 rounded-4 shadow-sm text-center border-top border-primary border-4">
-                                            <i className="fas fa-school text-primary fs-2 mb-2"></i>
+                                        <div className="card-custom p-4 p-lg-5 rounded-4 shadow-sm text-center border-top border-orange border-4">
+                                            <i className="fas fa-school text-orange fs-2 mb-2"></i>
                                             <div className="text-secondary fw-bold text-uppercase mb-1 small">Sekolah</div>
-                                            <div className="fs-1 fw-bold text-dark">{totalSekolahUnik}</div>
+                                            <div className="fs-1 fw-bold text-white">{totalSekolahUnik}</div>
                                         </div>
                                     </div>
                                     <div className="col-12 col-md-4">
                                         <div className="card-custom p-4 p-lg-5 rounded-4 shadow-sm text-center border-top border-success border-4">
                                             <i className="fas fa-id-badge text-success fs-2 mb-2"></i>
                                             <div className="text-secondary fw-bold text-uppercase mb-1 small">Petugas</div>
-                                            <div className="fs-1 fw-bold text-dark">{totalPendampingAktif}</div>
+                                            <div className="fs-1 fw-bold text-white">{totalPendampingAktif}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -901,10 +931,10 @@
                                 <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 mb-4 border-bottom border-secondary border-opacity-50 pb-3">
                                     <div className="d-flex align-items-center gap-2">
                                         <div className="bg-secondary text-white p-2 rounded-3 shadow-sm"><i className="fas fa-file-pdf fs-5"></i></div>
-                                        <h5 className="text-dark fw-bold m-0">Arsip Scan Dokumen</h5>
+                                        <h5 className="text-white fw-bold m-0">Arsip Scan Dokumen</h5>
                                     </div>
                                     <div className="input-group" style={{maxWidth: '350px'}}>
-                                        <span className="input-group-text bg-white border-secondary border-opacity-50 text-primary"><i className="fas fa-search"></i></span>
+                                        <span className="input-group-text bg-black border-secondary border-opacity-50 text-orange"><i className="fas fa-search"></i></span>
                                         <input type="text" className="form-control border-start-0 ps-0" placeholder="Cari sekolah, petugas..." value={searchArsip} onChange={e=>setSearchArsip(e.target.value)} />
                                     </div>
                                 </div>
@@ -917,12 +947,12 @@
                                             <div className="card-custom p-3 p-md-4 rounded-4 shadow-sm h-100 d-flex flex-column hover-shadow transition border-0" style={{transition: 'transform 0.3s', cursor: 'pointer'}} onMouseOver={e=>e.currentTarget.style.transform='translateY(-5px)'} onMouseOut={e=>e.currentTarget.style.transform='translateY(0)'}>
                                                 <div className="d-flex justify-content-between align-items-start mb-3">
                                                     <div className="bg-danger bg-opacity-10 p-2 rounded-3 border border-danger border-opacity-25 text-danger"><i className="fas fa-file-pdf fs-5"></i></div>
-                                                    <span className="badge bg-light border border-secondary border-opacity-50 text-secondary" style={{fontSize:'0.65rem'}}>{item.bulan} {item.tahun}</span>
+                                                    <span className="badge bg-dark border border-secondary border-opacity-50 text-light-gray" style={{fontSize:'0.65rem'}}>{item.bulan} {item.tahun}</span>
                                                 </div>
-                                                <h6 className="text-dark fw-bold mb-2 lh-base">{item.sekolah}</h6>
-                                                <div className="bg-light px-2 py-1 rounded text-dark fw-bold mb-3 border border-secondary border-opacity-50" style={{fontSize:'0.75rem'}}><i className="fas fa-user-tie text-primary me-2"></i>{item.pendamping || '-'}</div>
+                                                <h6 className="text-white fw-bold mb-2 lh-base">{item.sekolah}</h6>
+                                                <div className="bg-black px-2 py-1 rounded text-white fw-bold mb-3 border border-secondary border-opacity-50" style={{fontSize:'0.75rem'}}><i className="fas fa-user-tie text-orange me-2"></i>{item.pendamping || '-'}</div>
                                                 <div className="mt-auto">
-                                                    {item.url!=='#' ? <a href={item.url} target="_blank" className="btn btn-sm btn-outline-danger w-100 fw-bold bg-white"><i className="fas fa-external-link-alt me-2"></i> Buka PDF</a> : <button disabled className="btn btn-sm btn-light w-100 text-secondary border border-secondary">Offline</button>}
+                                                    {item.url!=='#' ? <a href={item.url} target="_blank" className="btn btn-sm btn-outline-danger w-100 fw-bold bg-dark text-white"><i className="fas fa-external-link-alt me-2"></i> Buka PDF</a> : <button disabled className="btn btn-sm btn-dark w-100 text-secondary border border-secondary">Offline</button>}
                                                 </div>
                                             </div>
                                         </div>
@@ -933,9 +963,9 @@
                         )}
                         
                         {/* FOOTER CREDIT - DEVELOPER */}
-                        <div className="mt-5 pt-4 text-center border-top border-secondary border-opacity-50 fade-in pb-4">
-                            <h6 className="text-primary fw-bold mb-1">VERIF DIGITAL SDM PKH TAPIN</h6>
-                            <div className="text-secondary small fw-bold">DEVELOPER BY, M. ZAEN SYACHRULLAH</div>
+                        <div className="mt-5 pt-4 text-center border-top border-secondary border-opacity-25 fade-in pb-4">
+                            <h6 className="text-orange fw-bold mb-1">VERIF DIGITAL SDM PKH TAPIN</h6>
+                            <div className="text-white small fw-bold">DEVELOPER BY, M. ZAEN SYACHRULLAH</div>
                             <div className="text-secondary small mt-1" style={{fontSize: '0.75rem'}}>VERSI AUTO TAHUN 2026</div>
                         </div>
 
