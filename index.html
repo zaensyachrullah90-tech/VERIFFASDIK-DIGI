@@ -126,22 +126,31 @@
             const fileInputRef = useRef(null);
             const showToast = (message, type = 'success') => setToast({ message, type });
 
-            // LOGIKA FETCH DIKUNCI MATI TAPI DITAMBAHKAN REDIRECT FOLLOW UNTUK CEGAH BLOKIR
+            // PENYEMPURNAAN MUTLAK: Menggunakan GET untuk baca data agar tembus blokir CORS 100%
             const fetchGAS = async (payload) => {
                 try {
-                    const res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, redirect: 'follow' });
+                    let res;
+                    if (payload.action === 'getRecords') {
+                        // Gunakan GET query khusus untuk ambil data (Jauh lebih stabil dari POST)
+                        res = await fetch(`${backendUrl}?action=getRecords`, { method: 'GET' });
+                    } else {
+                        // Gunakan POST untuk operasi simpan, hapus, update
+                        res = await fetch(backendUrl, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'text/plain;charset=utf-8' } });
+                    }
+                    
                     const text = await res.text();
                     try { 
                         const data = JSON.parse(text); 
-                        if (data.status === 'error' && data.message && data.message.length > 100) {
+                        // Topeng error HANYA diberlakukan untuk ekstraksi AI (Gemini), tidak untuk database!
+                        if (data.status === 'error' && payload.action === 'extract_multiple' && data.message && data.message.length > 100) {
                             data.message = "Server Sibuk / API Limit. Coba lagi.";
                         }
                         return data; 
                     } catch (e) { 
-                        throw new Error("Akses Ditolak! Pastikan saat Deploy Web App, 'Who has access' diatur ke 'Anyone' (Semua Orang)."); 
+                        throw new Error("Respons server bukan format yang valid. Cek pengaturan URL API Anda."); 
                     }
                 } catch (err) {
-                    throw new Error("Koneksi terputus! Buka 'Setup API' (ikon roda gigi), pastikan URL benar.");
+                    throw new Error("Gagal Menghubungkan ke Server (Periksa Koneksi atau Pengaturan URL API)");
                 }
             };
 
@@ -360,7 +369,15 @@
             };
 
             const resetForm = () => { setUploadState('idle'); setExtractedData({ sekolah: '', bulan: '', tahun: '', siswa: [] }); setProcessedFiles([]); setStagedFiles([]); };
-            const saveSettings = () => { localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl); setBackendUrl(tempUrl); setShowSettings(false); showToast('URL API berhasil disimpan!', 'success'); };
+            
+            const saveSettings = () => { 
+                localStorage.setItem('VERIFDIGI_BACKEND_URL', tempUrl); 
+                setBackendUrl(tempUrl); 
+                setShowSettings(false); 
+                showToast('URL API berhasil disimpan! Silakan muat ulang (refresh) halaman.', 'success'); 
+                // Otomatis tarik data ulang pakai URL baru
+                setTimeout(() => window.location.reload(), 1500);
+            };
 
             const currentRecords = Array.isArray(records) ? records : [];
             const optionsPendamping = [...new Set(currentRecords.map(r => r?.pendamping))].filter(Boolean);
